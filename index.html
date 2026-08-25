@@ -252,8 +252,9 @@ p{margin:0 0 .9em}
 .sq.mark-a{box-shadow:inset 0 0 0 4px rgba(23,124,96,.95)}
 .sq.mark-b{box-shadow:inset 0 0 0 4px rgba(112,182,255,.95)}
 .sq.sweep{background:linear-gradient(150deg,#f7d788,#e2b243)!important;transition:background-color .12s}
-.sq.file-hl{background:linear-gradient(150deg,#cfe3f5,#9dbfe0)!important}
-.sq.rank-hl{background:linear-gradient(150deg,#f5d9cf,#e0b09d)!important}
+/* contorno colorido em vez de preenchimento sólido: a casa continua clara ou escura por baixo */
+.sq.file-hl{box-shadow:inset 0 0 0 3px rgba(112,182,255,.95),inset 0 0 0 100px rgba(112,182,255,.24)}
+.sq.rank-hl{box-shadow:inset 0 0 0 3px rgba(255,150,110,.95),inset 0 0 0 100px rgba(255,150,110,.24)}
 
 /* marcadores de movimento */
 .dot{
@@ -1486,9 +1487,7 @@ b5.coordsBar($('#ranks5'),$('#files5'));
       if(tk!==sweepTk||current!==5)return;
       b5.clearMarks();
       if(i>=8){
-        for(var k=0;k<8;k+=2)for(var j=0;j<8;j++){
-          b5.mark(kind==='file'?nm(k,j):nm(j,k),kind==='file'?'file-hl':'rank-hl');
-        }
+        b5.clearMarks();
         setReadout(ro,kind==='file'
           ? 'São 8 colunas em pé, da letra a até a letra h.'
           : 'São 8 fileiras deitadas, do número 1 até o número 8.');
