@@ -202,13 +202,17 @@ p{margin:0 0 .9em}
    3. TABULEIRO
    ============================================================ */
 .board-wrap{
-  display:grid;grid-template-columns:18px 1fr;grid-template-rows:1fr 18px;
-  gap:4px;width:min(100%,var(--bw,440px));margin:0 auto;
+  display:grid;
+  grid-template-columns:clamp(22px,3.4vw,32px) 1fr;
+  grid-template-rows:1fr clamp(20px,3vw,30px);
+  gap:5px;width:min(100%,var(--bw,460px),66vh);margin:0 auto;
 }
 .board-wrap.nocoord{grid-template-columns:1fr;grid-template-rows:1fr}
-.ranks{display:grid;grid-template-rows:repeat(8,1fr);font-family:var(--f-mono);font-size:.65rem;color:var(--txt-3)}
+.ranks{display:grid;grid-template-rows:repeat(8,1fr);font-family:var(--f-mono);
+  font-size:clamp(.85rem,1.6vw,1.1rem);font-weight:700;color:var(--gold-2)}
 .ranks span{display:grid;place-items:center}
-.files{grid-column:2;display:grid;grid-template-columns:repeat(8,1fr);font-family:var(--f-mono);font-size:.65rem;color:var(--txt-3)}
+.files{grid-column:2;display:grid;grid-template-columns:repeat(8,1fr);font-family:var(--f-mono);
+  font-size:clamp(.85rem,1.6vw,1.1rem);font-weight:700;color:var(--gold-2)}
 .files span{display:grid;place-items:center}
 .board{
   grid-column:2;grid-row:1;display:grid;
@@ -227,7 +231,7 @@ p{margin:0 0 .9em}
 .sq.d{background:linear-gradient(150deg,#95693a,var(--wood-d))}
 .sq.pick{cursor:pointer}
 .sq .coord{
-  position:absolute;top:2px;left:3px;font-family:var(--f-mono);font-size:.5rem;
+  position:absolute;top:2px;left:3px;font-family:var(--f-mono);font-size:clamp(.5rem,1.1vw,.7rem);font-weight:700;
   color:rgba(0,0,0,.42);opacity:0;transition:opacity .2s;pointer-events:none
 }
 .board.showcoords .sq .coord{opacity:1}
@@ -237,6 +241,17 @@ p{margin:0 0 .9em}
 .sq.bad{background:linear-gradient(150deg,#ef8b84,#cf5148)!important}
 .sq.center-hl{animation:pulseC 1.8s ease-in-out infinite}
 @keyframes pulseC{0%,100%{box-shadow:inset 0 0 0 0 rgba(233,185,73,0)}50%{box-shadow:inset 0 0 22px 5px rgba(233,185,73,.75)}}
+.sq.center-red{
+  background:linear-gradient(150deg,#ef6a5e,#c93a2e)!important;
+  animation:pulseR 1s ease-in-out infinite
+}
+@keyframes pulseR{
+  0%,100%{filter:brightness(.72);box-shadow:inset 0 0 0 0 rgba(255,110,100,0)}
+  50%{filter:brightness(1.18);box-shadow:inset 0 0 22px 6px rgba(255,130,120,.8)}
+}
+.sq.mark-a{box-shadow:inset 0 0 0 4px rgba(23,124,96,.95)}
+.sq.mark-b{box-shadow:inset 0 0 0 4px rgba(112,182,255,.95)}
+.sq.sweep{background:linear-gradient(150deg,#f7d788,#e2b243)!important;transition:background-color .12s}
 .sq.file-hl{background:linear-gradient(150deg,#cfe3f5,#9dbfe0)!important}
 .sq.rank-hl{background:linear-gradient(150deg,#f5d9cf,#e0b09d)!important}
 
@@ -260,6 +275,7 @@ p{margin:0 0 .9em}
   filter:drop-shadow(0 3px 3px rgba(0,0,0,.45));
   transition:transform .3s cubic-bezier(.2,.8,.3,1)
 }
+.sq>.pc{position:absolute;left:7%;top:7%;width:86%;height:86%}
 .pc.w{--fill:#f7f1e4;--stroke:#2b2117}
 .pc.b{--fill:#231d15;--stroke:#d9cdb6}
 .pc{pointer-events:none}
@@ -279,6 +295,7 @@ p{margin:0 0 .9em}
   font-family:var(--f-mono);font-size:1rem;color:var(--gold-2);
   background:var(--bg-2);border:1px dashed var(--line);border-radius:var(--r-s);padding:10px 14px;text-align:center
 }
+.readout.lg{font-size:clamp(1.05rem,2.4vw,1.35rem);min-height:78px;padding:16px 18px}
 .readout.ok{color:var(--ok);border-color:var(--ok);border-style:solid}
 .readout.no{color:var(--no);border-color:var(--no);border-style:solid}
 
@@ -309,20 +326,24 @@ p{margin:0 0 .9em}
 /* evolução (comparativo) */
 .evo{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
 .evo-card{text-align:center;transition:.3s}
-.evo-card .art{height:120px;display:grid;place-items:center;margin-bottom:10px}
+.evo-card .art{height:110px;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px}
+.evo-card .art svg{flex:none}
 .evo-card.dim{opacity:.42;filter:grayscale(.6)}
 
 /* peças: seletor */
 .piecebar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
 .pbtn{
-  width:74px;height:74px;border-radius:var(--r-m);background:var(--card);border:1px solid var(--line);
+  width:clamp(78px,10vw,104px);height:clamp(78px,10vw,104px);border-radius:var(--r-m);background:var(--card);border:1px solid var(--line);
   display:grid;place-items:center;cursor:pointer;transition:.22s;padding:6px
 }
 .pbtn svg{width:100%;height:100%}
 .pbtn:hover{transform:translateY(-5px);border-color:var(--gold-dim);background:var(--card-2)}
 .pbtn.on{border-color:var(--gold);background:var(--card-2);box-shadow:0 0 20px rgba(233,185,73,.18)}
-.pdetail{display:grid;grid-template-columns:130px 1fr;gap:18px;align-items:center;min-height:150px}
-.pdetail .big{width:130px;height:130px;animation:pop .4s cubic-bezier(.2,1.3,.4,1) both}
+.pdetail{display:grid;grid-template-columns:170px 1fr;gap:22px;align-items:center;min-height:190px}
+.pdetail .big{width:170px;height:170px;animation:pop .4s cubic-bezier(.2,1.3,.4,1) both}
+.pdetail h3{font-size:clamp(1.5rem,3.4vw,2.1rem);margin-bottom:8px}
+.pdetail p{font-size:clamp(1.02rem,2.1vw,1.25rem);line-height:1.55}
+.pdetail .pill{font-size:clamp(.92rem,1.8vw,1.05rem);padding:9px 16px}
 
 /* valores */
 .valrow{display:flex;align-items:center;gap:14px}
@@ -407,8 +428,8 @@ th{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.12em;text-transform
   .cover .art{order:-1}
   .tilt{transform:perspective(900px) rotateX(8deg)}
   .tilt.settled{transform:none}
-  .pdetail{grid-template-columns:96px 1fr;gap:12px}
-  .pdetail .big{width:96px;height:96px}
+  .pdetail{grid-template-columns:110px 1fr;gap:14px}
+  .pdetail .big{width:110px;height:110px}
 }
 @media (max-width:560px){
   :root{--top:52px;--bot:74px}
@@ -419,9 +440,10 @@ th{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.12em;text-transform
   .brand{font-size:.82rem}
   .brand small{display:none}
   .card{padding:14px}
-  .pbtn{width:60px;height:60px}
+  .piecebar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;justify-items:center}
+  .pbtn{width:100%;max-width:112px;height:auto;aspect-ratio:1/1}
   .nav-btn{width:48px;height:48px;border-radius:14px}
-  .board-wrap{grid-template-columns:14px 1fr;grid-template-rows:1fr 14px}
+  .board-wrap{grid-template-columns:20px 1fr;grid-template-rows:1fr 18px;width:min(100%,var(--bw,460px))}
   .valrow .nm{width:56px;font-size:.8rem}
   .valrow svg{width:32px;height:32px}
   .menu-list{grid-template-columns:1fr}
@@ -586,7 +608,7 @@ th{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.12em;text-transform
       <div class="readout" id="sqReadout">Passe o dedo ou o mouse sobre uma casa.</div>
       <p class="small">Este endereço de casas é a linguagem oficial do xadrez: quem sabe ler <b>e4</b> consegue acompanhar qualquer partida escrita em qualquer lugar do mundo.</p>
     </div>
-    <div class="board-wrap" id="wrap5" style="--bw:430px">
+    <div class="board-wrap" id="wrap5" style="--bw:540px">
       <div class="ranks" id="ranks5"></div>
       <div class="board showcoords" id="board5" role="grid" aria-label="Tabuleiro com coordenadas"></div>
       <div class="files" id="files5"></div>
@@ -612,7 +634,7 @@ th{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.12em;text-transform
       </div>
       <p class="small">Acertos seguidos: <b id="findStreak">0</b></p>
     </div>
-    <div class="board-wrap" id="wrap6" style="--bw:430px">
+    <div class="board-wrap" id="wrap6" style="--bw:540px">
       <div class="ranks" id="ranks6"></div>
       <div class="board" id="board6" role="grid" aria-label="Tabuleiro do desafio"></div>
       <div class="files" id="files6"></div>
@@ -649,10 +671,10 @@ th{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.12em;text-transform
         <div class="card center"><div class="num" style="font-family:var(--f-disp);font-size:2rem;color:var(--gold)">16</div><div class="small">peças brancas</div></div>
         <div class="card center"><div class="num" style="font-family:var(--f-disp);font-size:2rem;color:var(--gold)">16</div><div class="small">peças pretas</div></div>
       </div>
-      <div class="readout" id="initReadout">Clique em uma peça para ver o nome dela.</div>
+      <div class="readout lg" id="initReadout">Clique em uma peça para ver o nome dela.</div>
       <button class="btn sm" id="btnReplay9">Montar de novo</button>
     </div>
-    <div class="board-wrap" id="wrap9" style="--bw:430px">
+    <div class="board-wrap" id="wrap9" style="--bw:540px">
       <div class="ranks" id="ranks9"></div>
       <div class="board" id="board9" role="grid" aria-label="Tabuleiro na posição inicial"></div>
       <div class="files" id="files9"></div>
@@ -672,7 +694,7 @@ th{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.12em;text-transform
       </div>
       <button class="btn sm" id="btnReplay10">Ver a animação de novo</button>
     </div>
-    <div class="board-wrap" id="wrap10" style="--bw:430px">
+    <div class="board-wrap" id="wrap10" style="--bw:480px">
       <div class="ranks" id="ranks10"></div>
       <div class="board" id="board10" role="grid" aria-label="Damas e reis na posição inicial"></div>
       <div class="files" id="files10"></div>
@@ -849,11 +871,11 @@ th{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.12em;text-transform
       <p class="lead" style="font-size:1.1rem">"No xadrez, não basta saber onde sua peça pode ir. É preciso pensar no que acontecerá depois da sua jogada."</p>
       <div class="card" id="finalScore" style="margin:16px 0"></div>
       <div style="display:flex;gap:12px;flex-wrap:wrap">
-        <a class="btn" href="https://lichess.org/pt" target="_blank" rel="noopener noreferrer">JOGAR XADREZ ↗</a>
+        <a class="btn" href="https://brunodiasef.github.io/xadrezpratica/" target="_blank" rel="noopener noreferrer">JOGAR XADREZ ↗</a>
         <button class="btn ghost" id="btnRestartAll">Rever a aula do início</button>
       </div>
       <p class="small" style="margin-top:10px">Ainda faltam três regras especiais para conhecer depois desta aula: o <b>roque</b>, a <b>promoção</b> do peão e a captura <b>en passant</b>. Elas aparecem menos no começo, mas fazem parte do jogo.</p>
-      <p class="small" style="margin-top:8px">O botão abre o Lichess, um site gratuito e sem cadastro obrigatório para jogar no navegador. Se a escola não tiver internet liberada, o tabuleiro de madeira funciona igualmente bem.</p>
+      <p class="small" style="margin-top:8px">O botão abre a área de prática de xadrez da turma. Se a escola estiver sem internet, o tabuleiro de madeira funciona igualmente bem.</p>
     </div>
     <div class="art">
       <div class="board-wrap nocoord" style="--bw:400px">
@@ -979,7 +1001,7 @@ Board.prototype.clearMarks=function(){
   var self=this;
   Object.keys(this.cells).forEach(function(k){
     var c=self.cells[k];
-    c.classList.remove('hl','hl-soft','good','bad','center-hl','file-hl','rank-hl');
+    c.classList.remove('hl','hl-soft','good','bad','center-hl','center-red','file-hl','rank-hl','sweep','mark-a','mark-b');
     $$('.dot',c).forEach(function(d){d.remove();});
   });
 };
@@ -1104,7 +1126,7 @@ var DIRS={
 DIRS.Q=DIRS.R.concat(DIRS.B);
 var NJUMP=[[1,2],[2,1],[2,-1],[1,-2],[-1,-2],[-2,-1],[-2,1],[-1,2]];
 
-function legalMoves(pos,sq){
+function legalMoves(pos,sq,raw){
   var code=pos[sq];
   var out={moves:[],caps:[],all:[]};
   if(!code)return out;
@@ -1117,7 +1139,16 @@ function legalMoves(pos,sq){
     if(t.charAt(0)!==color)out.caps.push(nm(ff,rr));
     return 'stop';
   }
-  if(type==='K'){DIRS.Q.forEach(function(d){add(f+d[0],r+d[1]);});}
+  if(type==='K'){
+    DIRS.Q.forEach(function(d){add(f+d[0],r+d[1]);});
+    if(!raw){
+      /* o rei nunca pode entrar em casa atacada pelo adversário */
+      var atk=attacked(pos,color==='w'?'b':'w',sq);
+      var free=function(t){return !atk[t];};
+      out.moves=out.moves.filter(free);
+      out.caps=out.caps.filter(free);
+    }
+  }
   else if(type==='N'){NJUMP.forEach(function(d){add(f+d[0],r+d[1]);});}
   else if(type==='P'){
     var dir=color==='w'?1:-1,start=color==='w'?1:6;
@@ -1144,7 +1175,7 @@ function legalMoves(pos,sq){
   return out;
 }
 /* casas atacadas por uma cor (para xeque e afogamento) */
-function attacked(pos,color){
+function attacked(pos,color,ignoreSq){
   var set={};
   Object.keys(pos).forEach(function(sq){
     var code=pos[sq];
@@ -1156,7 +1187,7 @@ function attacked(pos,color){
       });
       return;
     }
-    var m=legalMoves(pos,sq);
+    var m=legalMoves(pos,sq,true);
     m.all.forEach(function(s){set[s]=true;});
     /* casas defendidas (ocupadas por peça própria) também contam como atacadas */
     var pp=idx(sq),type=code.charAt(1);
@@ -1167,7 +1198,12 @@ function attacked(pos,color){
     }else if(DIRS[type]){
       DIRS[type].forEach(function(d){
         var ff=pp[0]+d[0],rr=pp[1]+d[1];
-        while(inb(ff,rr)){set[nm(ff,rr)]=true;if(pos[nm(ff,rr)])break;ff+=d[0];rr+=d[1];}
+        while(inb(ff,rr)){
+          set[nm(ff,rr)]=true;
+          /* a casa do rei não bloqueia o raio: ele não escapa andando para trás na mesma linha */
+          if(pos[nm(ff,rr)]&&nm(ff,rr)!==ignoreSq)break;
+          ff+=d[0];rr+=d[1];
+        }
       });
     }
   });
@@ -1427,7 +1463,7 @@ function setEvo(i){
 var b5=new Board($('#board5'));
 b5.coordsBar($('#ranks5'),$('#files5'));
 (function(){
-  var ro=$('#sqReadout');
+  var ro=$('#sqReadout'),sweepTk=0;
   function show(sq){
     var p=idx(sq);
     setReadout(ro,sq+'  ·  coluna '+sq[0]+', fileira '+sq[1]+'  ·  casa '+(isLight(p[0],p[1])?'clara':'escura'));
@@ -1440,23 +1476,36 @@ b5.coordsBar($('#ranks5'),$('#files5'));
     setReadout(ro,'Passe o dedo ou o mouse sobre uma casa.');
   });
   b5.onSquare(function(sq,c){
+    sweepTk++;                    /* interrompe a varredura em andamento */
+    $$('#boardChips .chip').forEach(function(x){x.classList.remove('on');});
     b5.clearMarks();c.classList.add('hl');show(sq);SFX.click();
   });
+  function sweep(kind){
+    var tk=++sweepTk,i=0,ro=$('#sqReadout');
+    (function step(){
+      if(tk!==sweepTk||current!==5)return;
+      b5.clearMarks();
+      if(i>=8){
+        for(var k=0;k<8;k+=2)for(var j=0;j<8;j++){
+          b5.mark(kind==='file'?nm(k,j):nm(j,k),kind==='file'?'file-hl':'rank-hl');
+        }
+        setReadout(ro,kind==='file'
+          ? 'São 8 colunas em pé, da letra a até a letra h.'
+          : 'São 8 fileiras deitadas, do número 1 até o número 8.');
+        return;
+      }
+      for(var j=0;j<8;j++)b5.mark(kind==='file'?nm(i,j):nm(j,i),'sweep');
+      setReadout(ro,kind==='file'
+        ? 'Coluna '+FILES[i]+' · uma fila em pé, de baixo para cima'
+        : 'Fileira '+(i+1)+' · uma fila deitada, da esquerda para a direita');
+      SFX.click();
+      i++;
+      setTimeout(step,reduced()?40:560);
+    })();
+  }
   var chips=[
-    {k:'Colunas (a–h)',f:function(){
-      b5.clearMarks();
-      ['a','c','e','g'].forEach(function(L){
-        for(var r=0;r<8;r++)b5.mark(L+(r+1),'file-hl');
-      });
-      setReadout($('#sqReadout'),'Colunas: as oito filas em pé, da letra a até a letra h.');
-    }},
-    {k:'Fileiras (1–8)',f:function(){
-      b5.clearMarks();
-      [1,3,5,7].forEach(function(n){
-        for(var f=0;f<8;f++)b5.mark(nm(f,n-1),'rank-hl');
-      });
-      setReadout($('#sqReadout'),'Fileiras: as oito filas deitadas, numeradas de 1 a 8.');
-    }},
+    {k:'Colunas (a–h)',f:function(){sweep('file');}},
+    {k:'Fileiras (1–8)',f:function(){sweep('rank');}},
     {k:'64 casas',f:function(){
       b5.clearMarks();
       var i=0;
@@ -1539,7 +1588,7 @@ enterHooks[6]=function(){newTarget();};
     var isRight=(i===0)===correctFirst;
     var card=el('div','card center');
     card.style.cursor='pointer';
-    card.innerHTML='<div class="board-wrap nocoord" style="--bw:280px"><div class="board"></div></div><div class="small" style="margin-top:10px">Opção '+(i+1)+'</div>';
+    card.innerHTML='<div class="board-wrap nocoord" style="--bw:320px"><div class="board"></div></div><div class="small" style="margin-top:10px">Opção '+(i+1)+'</div>';
     var bd=new Board($('.board',card),{mirror:!isRight});
     card.tabIndex=0;card.setAttribute('role','button');
     card.setAttribute('aria-label','Opção '+(i+1)+' de posicionamento do tabuleiro');
@@ -1675,7 +1724,7 @@ function buildMoveScreen(cfg){
       '<div class="wrapc" id="acts'+cfg.n+'"></div>'+
       (cfg.note?'<p class="small">'+cfg.note+'</p>':'')+
     '</div>'+
-    '<div class="board-wrap" id="wrap'+cfg.n+'" style="--bw:420px">'+
+    '<div class="board-wrap" id="wrap'+cfg.n+'" style="--bw:480px">'+
       '<div class="ranks" id="ranks'+cfg.n+'"></div>'+
       '<div class="board" id="board'+cfg.n+'" role="grid" aria-label="Tabuleiro: '+cfg.title+'"></div>'+
       '<div class="files" id="files'+cfg.n+'"></div>'+
@@ -1717,7 +1766,12 @@ function buildMoveScreen(cfg){
         SFX.no();
         var c=bd.cells[sq];c.classList.add('bad');
         setTimeout(function(){c.classList.remove('bad');},650);
-        setReadout(ro,'Movimento inválido: '+NAMES[cfg.pos[cfg.from].charAt(1)].toLowerCase()+' não alcança '+sq+'. '+(cfg.invalidTip||''),'no');
+        var rawm=legalMoves(state.pos,state.from,true);
+        if(cfg.attackedTip&&rawm.all.indexOf(sq)>-1){
+          setReadout(ro,'A casa '+sq+' está atacada. '+cfg.attackedTip,'no');
+        }else{
+          setReadout(ro,'Movimento inválido: '+NAMES[cfg.pos[cfg.from].charAt(1)].toLowerCase()+' não alcança '+sq+'. '+(cfg.invalidTip||''),'no');
+        }
         return;
       }
       var cap=m.caps.indexOf(sq)>-1;
@@ -1795,11 +1849,12 @@ function buildMoveScreen(cfg){
 buildMoveScreen({
   n:11,title:'O rei ♔',mode:'move',
   lead:'O rei anda <b>uma casa por vez</b>, em qualquer das oito direções: para os lados, para frente, para trás e nas diagonais. Ele é lento, e por isso costuma ficar protegido em um canto durante boa parte da partida.',
-  rule:'Clique em uma das casas marcadas para movimentar o rei. Se você clicar em uma casa longe demais, o tabuleiro avisa: movimentos ilegais não acontecem.',
+  rule:'Clique em uma das casas marcadas para movimentar o rei. Existe uma segunda regra tão importante quanto o alcance: <b>o rei nunca entra em casa atacada</b>.',
   hint:'As bolinhas mostram para onde o rei pode ir agora.',
   invalidTip:'O rei nunca pula casas.',
+  attackedTip:'O peão preto de e5 captura na diagonal, então ele controla d4 e f4. O rei não pode entrar em nenhuma das duas.',
   pos:{e4:'wK',e5:'bP',d3:'wP'},from:'e4',
-  note:'A casa d3 tem um peão branco. Nenhuma peça pode ocupar a casa de uma companheira, então essa direção está fechada para o rei. Já o peão preto em e5 pode ser capturado.'
+  note:'Repare em três coisas: d3 tem um peão branco e nenhuma peça ocupa a casa de uma companheira; d4 e f4 não aparecem marcadas porque o peão preto de e5 ataca essas duas casas na diagonal; e o próprio peão de e5 pode ser capturado, já que ninguém o está defendendo.'
 });
 
 buildMoveScreen({
@@ -1844,13 +1899,16 @@ buildMoveScreen({
         i++;setTimeout(step,reduced()?60:520);
       })();
     }},
-    {k:'Ver as duas cores',f:function(bd,st,ro,reset){
+    {k:'Por que cada lado tem dois bispos?',f:function(bd,st,ro,reset){
       reset();
       bd.clearMarks();
+      bd.put('c1','wB',true);
+      st.pos['c1']='wB';
       for(var f=0;f<8;f++)for(var r=0;r<8;r++){
-        if(isLight(f,r))bd.mark(nm(f,r),'hl-soft');
+        bd.mark(nm(f,r),isLight(f,r)?'mark-a':'mark-b');
       }
-      setReadout(ro,'Um bispo cuida das 32 casas claras e o outro das 32 escuras. Juntos eles cobrem o tabuleiro inteiro.');
+      bd.mark('f1','hl');bd.mark('c1','hl');
+      setReadout(ro,'O bispo de f1 nasceu em casa clara e só enxerga as casas com contorno verde. O bispo de c1 nasceu em casa escura e só enxerga as de contorno azul. Por isso cada lado começa com dois: um para cada metade do tabuleiro.');
     }}
   ]
 });
@@ -1877,7 +1935,7 @@ buildMoveScreen({
       '<div class="wrapc" id="acts16"></div>'+
       '<p class="small">Se um peão atravessar o tabuleiro inteiro e chegar à última fileira, ele é <b>promovido</b>: sai do tabuleiro e vira outra peça, normalmente uma dama. É por isso que um peão avançado assusta tanto.</p>'+
     '</div>'+
-    '<div class="board-wrap" id="wrap16" style="--bw:420px">'+
+    '<div class="board-wrap" id="wrap16" style="--bw:480px">'+
       '<div class="ranks" id="ranks16"></div>'+
       '<div class="board" id="board16" role="grid" aria-label="Tabuleiro: o peão"></div>'+
       '<div class="files" id="files16"></div>'+
@@ -2119,7 +2177,7 @@ enterHooks[21]=function(tk){
   var CEN=['d4','e4','d5','e5'];
   function base(){
     bd.clear();bd.clearMarks();
-    CEN.forEach(function(s){bd.mark(s,'center-hl');});
+    CEN.forEach(function(s){bd.mark(s,'center-red');});
   }
   var opts=[
     {k:'As quatro casas centrais',f:function(){
