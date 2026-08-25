@@ -2,769 +2,2322 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Introdução ao Xadrez — Apresentação Interativa</title>
-<script>
-(function(){document.documentElement.classList.add('js');var off=false;
-try{var s=localStorage.getItem('xadrezAnim');off=s?(s==='off'):matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
-if(off)document.documentElement.classList.add('anim-off');})();
-</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14110d">
+<title>Introdução ao Xadrez | Aula interativa</title>
+<meta name="description" content="Aula interativa de introdução ao xadrez para o Ensino Fundamental: tabuleiro, peças, movimentos, xeque, xeque-mate e estratégia básica.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#141110;--card:#26201b;--card2:#2f2822;--line:#3d342b;--ink:#f5efe3;--muted:#b9ac99;--gold:#e8b64c;--gold2:#f6d489;--wood-l:#f0d9b5;--wood-d:#b58863;--good:#7ac074;--bad:#e05656;--blue:#6aa5d8;--sh:0 10px 30px rgba(0,0,0,.45);--rad:16px;--disp:Georgia,'Times New Roman',serif;--body:system-ui,-apple-system,'Segoe UI',Roboto,Ubuntu,sans-serif}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+/* ============================================================
+   1. VARIÁVEIS
+   ============================================================ */
+:root{
+  --bg-0:#14110d;
+  --bg-1:#1c1811;
+  --bg-2:#241f16;
+  --card:#2a2318;
+  --card-2:#332a1d;
+  --line:#463a28;
+  --txt:#f3ece0;
+  --txt-2:#c3b7a3;
+  --txt-3:#8f8574;
+  --gold:#e9b949;
+  --gold-2:#f7d788;
+  --gold-dim:#a8842f;
+  --wood-l:#e8d2a8;
+  --wood-d:#8a6134;
+  --ok:#5fbf7d;
+  --no:#e0645c;
+  --wht:#f6efe2;
+  --blk:#211b13;
+  --r-s:10px;
+  --r-m:16px;
+  --r-l:24px;
+  --sh-1:0 2px 6px rgba(0,0,0,.35);
+  --sh-2:0 10px 30px rgba(0,0,0,.45);
+  --sh-3:0 24px 60px rgba(0,0,0,.55);
+  --f-disp:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
+  --f-body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,'Courier New',monospace;
+  --top:58px;
+  --bot:78px;
+  --dur:.45s;
+}
+
+/* ============================================================
+   2. BASE / LAYOUT
+   ============================================================ */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);overflow:hidden;font-size:16px;line-height:1.5}
-button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer}
-:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
-h1,h2,h3{font-family:var(--disp);letter-spacing:.5px}
-.bg{position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden;z-index:0;pointer-events:none;background:radial-gradient(1200px 700px at 70% -10%,rgba(232,182,76,.10),transparent 60%),radial-gradient(900px 600px at 10% 110%,rgba(181,136,99,.12),transparent 60%),repeating-conic-gradient(rgba(255,255,255,.022) 0 25%,transparent 0 50%) 0 0/120px 120px}
-.fp{position:absolute;font-size:22vmin;opacity:.05;color:var(--gold);filter:blur(1px);animation:floaty 26s ease-in-out infinite alternate}
-.fp.f1{top:6%;left:-4%}.fp.f2{bottom:-6%;right:-3%;font-size:26vmin;animation-delay:-11s}.fp.f3{top:40%;right:14%;font-size:14vmin;animation-delay:-18s}
-@keyframes floaty{from{transform:translateY(-3%) rotate(-6deg)}to{transform:translateY(4%) rotate(7deg)}}
-header.top{position:fixed;top:0;left:0;right:0;height:56px;z-index:40;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:linear-gradient(180deg,rgba(20,17,16,.96),rgba(20,17,16,.86));border-bottom:1px solid var(--line)}
-.brand{display:flex;align-items:center;gap:8px;font-family:var(--disp);font-size:17px}
-.brand .bp{color:var(--gold);font-size:22px;display:inline-block;animation:bob 3s ease-in-out infinite}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-.brand small{color:var(--muted);font-family:var(--body);font-size:12px}
-.top-actions{display:flex;gap:8px}
-.tbtn{padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-size:14px;transition:transform .15s,background .15s,border-color .15s}
-.tbtn:hover{background:var(--card2);border-color:var(--gold);transform:translateY(-1px)}
-.tbtn.warn{border-color:var(--gold);box-shadow:0 0 10px rgba(232,182,76,.35)}
-#progress{position:absolute;left:0;bottom:-1px;height:3px;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .4s;box-shadow:0 0 8px rgba(232,182,76,.7)}
-nav.bottom{position:fixed;bottom:0;left:0;right:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(0deg,rgba(20,17,16,.97),rgba(20,17,16,.88));border-top:1px solid var(--line)}
-.nbtn{padding:12px 20px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-size:15px;font-weight:600;transition:transform .15s,background .15s,opacity .15s}
-.nbtn:hover:not(:disabled){background:var(--card2);border-color:var(--gold);transform:translateY(-1px)}
-.nbtn:disabled{opacity:.35;cursor:not-allowed}
-.nbtn.primary{background:linear-gradient(180deg,var(--gold),#c99a37);color:#241b09;border-color:transparent}
-#counter{color:var(--muted);font-size:14px;min-width:64px;text-align:center}
-main#slides{position:fixed;top:0;left:0;right:0;bottom:0;z-index:10}
-.slide{position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;display:none;padding:76px 18px 110px}
-.slide.active{display:block}
-.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
-.s-head{text-align:center}
-.kicker{display:inline-block;font-size:12px;letter-spacing:3px;color:var(--gold);border:1px solid rgba(232,182,76,.4);padding:4px 12px;border-radius:999px;background:rgba(232,182,76,.08)}
-.s-head h2{font-size:clamp(24px,4.4vw,40px);margin:10px 0 6px}
-.s-head .sub{color:var(--muted);max-width:680px;margin:0 auto;font-size:clamp(14px,1.8vw,17px)}
-html.js .rv{opacity:0;transform:translateY(16px)}
-html.js .slide.active .rv{animation:fadeUp .6s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*110ms)}
-@keyframes fadeUp{to{opacity:1;transform:none}}
-.board{border-radius:10px;box-shadow:0 0 0 4px #5b4632,0 0 0 6px #3a2c1e,var(--sh);user-select:none}
-.board.mini{box-shadow:0 0 0 3px #5b4632,var(--sh)}
-.board.tiny{box-shadow:0 0 0 2px #5b4632}
-.sq{position:relative;display:flex;align-items:center;justify-content:center}
-.sq.light{background:var(--wood-l)}.sq.dark{background:var(--wood-d)}
-.sq .cl{position:absolute;font-weight:700;pointer-events:none;opacity:.85}
-.sq .cl.file{right:4%;bottom:2%}.sq .cl.rank{left:5%;top:3%}
-.sq.light .cl{color:var(--wood-d)}.sq.dark .cl{color:var(--wood-l)}
-.piece{line-height:1;z-index:2}
-.piece.w{color:#f8f4e9;text-shadow:0 2px 3px rgba(0,0,0,.6),0 0 2px #000}
-.piece.b{color:#241d17;text-shadow:0 0 3px rgba(255,255,255,.35),0 0 2px rgba(0,0,0,.9)}
-.board.clickable .sq{cursor:pointer}
-.sq.hl::after{content:'';position:absolute;width:30%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(246,212,137,.95),rgba(122,90,20,.85));box-shadow:0 1px 4px rgba(0,0,0,.5)}
-.sq.hl-cap::after{content:'';position:absolute;top:6%;left:6%;right:6%;bottom:6%;border-radius:50%;border:4px solid rgba(232,182,76,.9)}
-.sq.sel{box-shadow:inset 0 0 0 4px var(--gold)}
-.sq.glow{animation:glowP 1.6s ease-in-out infinite}
-@keyframes glowP{0%,100%{box-shadow:inset 0 0 0 3px rgba(232,182,76,.9)}50%{box-shadow:inset 0 0 0 5px rgba(246,212,137,1),0 0 18px rgba(232,182,76,.9)}}
-.sq.danger{animation:dangerP 1s ease-in-out infinite}
-@keyframes dangerP{0%,100%{box-shadow:inset 0 0 0 3px rgba(224,86,86,.9)}50%{box-shadow:inset 0 0 0 5px rgba(224,86,86,1),0 0 16px rgba(224,86,86,.8)}}
-.sq.no::after{content:'✕';position:absolute;font-weight:900;color:var(--bad);text-shadow:0 1px 2px #000}
-.sq.opt::after{content:'?';position:absolute;font-weight:900;color:#fff;background:rgba(0,0,0,.55);width:44%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center}
-.sq.trail{box-shadow:inset 0 0 0 3px rgba(232,182,76,.65)}
-.sq.cand{box-shadow:inset 0 0 0 3px rgba(106,165,216,.8)}
-.sq.okmark{box-shadow:inset 0 0 0 4px var(--good)}
-.sq.shake{animation:shake .4s}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6%)}75%{transform:translateX(6%)}}
-.sq.pop{animation:sqpop .5s both;animation-delay:var(--d,0ms)}
-@keyframes sqpop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
-.piece.drop{animation:pdrop .5s cubic-bezier(.2,1.4,.4,1) both;animation-delay:var(--d,0ms)}
-@keyframes pdrop{from{opacity:0;transform:scale(.2) translateY(-40%)}to{opacity:1;transform:none}}
-.piece.cap-out{animation:capout .35s forwards}
-@keyframes capout{to{opacity:0;transform:scale(.3) rotate(20deg)}}
-svg.arrows{position:absolute;top:0;left:0;width:100%;height:100%;z-index:3;pointer-events:none}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:16px 18px;box-shadow:var(--sh)}
-.split{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:center;justify-content:center}
-.msg{min-height:28px;font-size:17px;font-weight:700;text-align:center}
-.msg.good{color:var(--good)}.msg.bad{color:var(--bad)}.msg.gold{color:var(--gold)}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:12px;font-weight:800;font-size:16px;background:linear-gradient(180deg,var(--gold),#c99a37);color:#241b09;box-shadow:0 6px 18px rgba(232,182,76,.3);transition:transform .15s,filter .15s;text-decoration:none}
-.btn:hover{transform:translateY(-2px);filter:brightness(1.1)}
-.btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:none}
-.btn.small{padding:8px 14px;font-size:14px}
-.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:var(--card2);border:1px solid var(--line);font-size:13px;color:var(--muted)}
-.chip b{color:var(--gold)}
-.ctr{text-align:center}
-.formula{display:flex;gap:6px;justify-content:center;align-items:center;font-size:36px;margin:2px 0 10px;flex-wrap:wrap}
-.formula small{font-size:12px;color:var(--muted);margin:0 8px 6px 0}
-.formula .op{color:var(--gold);font-size:24px}
-.formula .fw{color:#f8f4e9;text-shadow:0 2px 3px rgba(0,0,0,.6)}
-.formula .fw.g{color:var(--gold)}
-.stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:860px;margin:0 auto}
-.stat{position:relative;background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:var(--rad);padding:22px 10px 18px;text-align:center;overflow:hidden;transition:transform .2s,border-color .2s}
-.stat:hover{transform:translateY(-6px) scale(1.02);border-color:var(--gold)}
-.stat .num{display:block;font-family:var(--disp);font-size:clamp(30px,5vw,52px);color:var(--gold)}
-.stat .lbl{font-weight:800;letter-spacing:1px;font-size:14px}
-.stat .ico{position:absolute;top:8px;right:10px;font-size:20px;opacity:.8}
-.stat .tip{position:absolute;left:0;right:0;bottom:0;background:rgba(232,182,76,.95);color:#241b09;font-size:12px;font-weight:700;padding:6px 8px;transform:translateY(100%);transition:transform .25s}
-.stat:hover .tip,.stat:focus-visible .tip{transform:none}
-.timeline{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;position:relative;max-width:900px;margin:6px auto 0}
-.timeline::before{content:'';position:absolute;top:27px;left:8%;right:8%;height:3px;background:linear-gradient(90deg,var(--gold),var(--line));border-radius:2px}
-.t-node{display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 2px;position:relative;z-index:1}
-.t-node .dot{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-size:24px;background:var(--card2);border:2px solid var(--line);transition:transform .2s,border-color .2s}
-.t-node:hover .dot{transform:scale(1.12);border-color:var(--gold)}
-.t-node.on .dot{border-color:var(--gold);box-shadow:0 0 0 5px rgba(232,182,76,.2),0 0 18px rgba(232,182,76,.5);transform:scale(1.1)}
-.t-node .tl-lbl{font-size:12px;font-weight:800;color:var(--muted);text-align:center}
-.t-node.on .tl-lbl{color:var(--gold)}
-#tlDetail{max-width:760px;margin:0 auto;text-align:center;animation:fadeUp .4s both}
-#tlDetail h3{color:var(--gold);font-size:22px;margin-bottom:6px}
-.era-tabs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-.era-btn{padding:10px 18px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-weight:700;transition:all .2s}
-.era-btn.on{background:var(--gold);color:#241b09;border-color:transparent}
-.era-panel{display:none;grid-template-columns:auto 1fr;gap:24px;align-items:center;max-width:880px;margin:0 auto;animation:fadeUp .45s both}
-.era-panel.on{display:grid}
-.era-panel h3{color:var(--gold);font-size:24px;margin-bottom:8px}
-.era-panel p,.era-panel ul{color:var(--muted)}
-.era-panel ul{margin:10px 0 0 18px}
-.piece-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;max-width:880px;margin:0 auto}
-.piece-card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:var(--rad);padding:16px 6px;text-align:center;transition:transform .2s,border-color .2s}
-.piece-card:hover{transform:translateY(-5px);border-color:var(--gold)}
-.piece-card.on{border-color:var(--gold);transform:scale(1.06)}
-.piece-card .big{font-size:44px;display:block;color:#f8f4e9;text-shadow:0 2px 3px rgba(0,0,0,.6)}
-.piece-card .pn{font-weight:800;font-size:14px}
-#pieceDetail{max-width:720px;margin:0 auto;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;animation:fadeUp .35s both}
-#pieceDetail .huge{font-size:84px;color:#f8f4e9;text-shadow:0 3px 4px rgba(0,0,0,.65)}
-#pieceDetail h3{color:var(--gold);font-size:26px}
-.val-cards{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;max-width:960px;margin:0 auto}
-.val{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:14px 8px;text-align:center;overflow:hidden}
-html.js .slide.active .val{animation:fadeUp .5s both;animation-delay:calc(var(--i)*160ms)}
-.val .vp{font-size:38px;display:block;color:#f8f4e9;text-shadow:0 2px 3px rgba(0,0,0,.6)}
-.val .vn{font-family:var(--disp);font-size:30px;color:var(--gold)}
-.val .vl{font-size:13px;font-weight:800}
-.val .bar{height:6px;border-radius:3px;background:var(--card2);margin-top:8px;overflow:hidden}
-.val .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width 1s .3s}
-.val.king .vn{font-size:20px;padding:6px 0}
-.think-steps{display:flex;flex-direction:column;max-width:560px;margin:0 auto}
-.think-step{display:flex;gap:14px;align-items:flex-start;padding:12px 16px;border-radius:14px;border:1px solid var(--line);background:var(--card);opacity:.45;transition:all .4s}
-.think-step .n{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:900;background:var(--card2);border:2px solid var(--line)}
-.think-step.on{opacity:1;border-color:var(--gold)}
-.think-step.on .n{background:var(--gold);color:#241b09;border-color:transparent}
-.think-link{width:3px;height:20px;background:var(--line);margin-left:29px}
-#quizBox{max-width:720px;margin:0 auto}
-.q-card{animation:fadeUp .4s both}
-.q-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap}
-.q-text{font-size:clamp(17px,2.4vw,22px);font-weight:800;margin-bottom:16px}
-.q-opts{display:grid;gap:10px}
-.q-opt{padding:14px 16px;border-radius:12px;border:1px solid var(--line);background:var(--card2);text-align:left;font-size:16px;font-weight:600;transition:all .15s;display:flex;justify-content:space-between;align-items:center;gap:10px}
-.q-opt:hover:not(:disabled){border-color:var(--gold);transform:translateX(4px)}
-.q-opt:disabled{cursor:default}
-.q-opt.good{border-color:var(--good);background:rgba(122,192,116,.15)}
-.q-opt.badp{border-color:var(--bad);background:rgba(224,86,86,.12);opacity:.7}
-.q-why{margin-top:12px;padding:12px 14px;border-radius:12px;background:rgba(232,182,76,.1);border:1px solid rgba(232,182,76,.35);font-size:15px}
-.q-final{text-align:center;animation:fadeUp .5s both}
-.q-final .medal{font-size:76px;display:block;animation:pdrop .7s cubic-bezier(.2,1.4,.4,1) both}
-.q-final .score{font-family:var(--disp);font-size:44px;color:var(--gold)}
-.orient-row{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;align-items:flex-start}
-.orient-item{text-align:center}
-.orient-item .olbl{font-weight:900;font-size:18px;margin-bottom:8px;color:var(--muted)}
-.orient-item .board{cursor:pointer}
-.orient-item.win .board{box-shadow:0 0 0 4px var(--good),var(--sh)}
-.orient-item.lose .board{animation:shake .4s}
-.corner-note{position:absolute;bottom:6%;right:6%;z-index:4;background:rgba(0,0,0,.65);color:var(--gold);padding:2px 6px;border-radius:6px;pointer-events:none;font-weight:900}
-.cover{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center}
-.cover h1{font-size:clamp(34px,7vw,72px);line-height:1.05;text-shadow:0 4px 24px rgba(0,0,0,.6)}
-.cover h1 .g{color:var(--gold)}
-.cover .tag{font-size:clamp(15px,2.4vw,22px);color:var(--muted);letter-spacing:2px;font-weight:600}
-.cover .board-wrap{position:relative;animation:cam 9s ease-in-out infinite alternate}
-@keyframes cam{from{transform:perspective(900px) rotateX(6deg) scale(1)}to{transform:perspective(900px) rotateX(2deg) scale(1.05) translateY(-6px)}}
-html.js .slide.active .cover h1{animation:fadeUp .9s .3s both}
-html.js .slide.active .cover .tag{animation:fadeUp .9s .6s both}
-html.js .slide.active .cover .btn{animation:fadeUp .9s 1.6s both}
-.final{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center}
-.final h2{font-size:clamp(30px,6vw,60px);color:var(--gold)}
-.final .quote{max-width:620px;font-size:clamp(16px,2.4vw,21px);font-style:italic;border-left:4px solid var(--gold);padding:10px 18px;background:var(--card);border-radius:0 12px 12px 0}
-#menu{position:fixed;top:0;left:0;right:0;bottom:0;z-index:60;background:rgba(15,12,10,.94);display:flex;flex-direction:column;padding:70px 16px 20px;overflow-y:auto}
-#menu[hidden]{display:none}
-#menu h3{text-align:center;color:var(--gold);font-size:24px;margin-bottom:16px}
-.menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;max-width:1000px;margin:0 auto;width:100%}
-.menu-item{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);font-size:13.5px;font-weight:600;text-align:left}
-.menu-item:hover{border-color:var(--gold)}
-.menu-item .mi-n{flex:none;width:26px;height:26px;border-radius:8px;background:var(--card2);display:grid;place-items:center;font-size:12px;color:var(--gold);font-weight:900}
-.menu-item.cur{border-color:var(--gold);background:rgba(232,182,76,.12)}
-.confetti{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:70;overflow:hidden}
-.confetti i{position:absolute;top:-4vh;width:10px;height:14px;border-radius:2px;animation:cfall linear forwards}
-@keyframes cfall{to{transform:translateY(115vh) rotate(720deg)}}
-.banner{position:fixed;top:0;left:0;right:0;bottom:0;display:grid;place-items:center;pointer-events:none;z-index:65}
-.banner span{font-family:var(--disp);font-size:clamp(40px,10vw,110px);color:var(--gold);text-shadow:0 0 30px rgba(232,182,76,.8),0 4px 6px #000;animation:banIn .8s cubic-bezier(.2,1.3,.4,1) both}
-@keyframes banIn{from{opacity:0;transform:scale(.3) rotate(-8deg)}to{opacity:1;transform:none}}
-.def-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:900px;margin:14px auto 0}
-.def-card{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:12px;text-align:center;transition:transform .2s}
-.def-card:hover{transform:translateY(-4px);border-color:var(--gold)}
-.def-card h4{color:var(--gold);margin:8px 0 4px;font-size:16px}
-.def-card p{font-size:13px;color:var(--muted)}
-#toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);z-index:80;background:var(--card2);border:1px solid var(--gold);color:var(--ink);padding:12px 18px;border-radius:12px;max-width:min(92vw,500px);box-shadow:var(--sh);font-size:14px;cursor:pointer}
-@media (max-width:900px){.split{grid-template-columns:1fr;justify-items:center}.stat-cards{grid-template-columns:repeat(2,1fr)}.piece-grid{grid-template-columns:repeat(3,1fr)}.val-cards{grid-template-columns:repeat(3,1fr)}.def-row{grid-template-columns:1fr;justify-items:center}.era-panel{grid-template-columns:1fr;justify-items:center;text-align:center}.era-panel ul{margin-left:0;list-style:none}.timeline{grid-template-columns:1fr;gap:2px}.timeline::before{top:8%;bottom:8%;left:27px;right:auto;width:3px;height:auto;background:linear-gradient(180deg,var(--gold),var(--line))}.t-node{flex-direction:row;text-align:left;padding:6px 0}.t-node .tl-lbl{font-size:14px}}
-@media (max-width:560px){.slide{padding:66px 10px 100px}.nbtn{padding:11px 12px;font-size:13px}.brand small{display:none}.piece-grid{grid-template-columns:repeat(3,1fr);gap:8px}.val-cards{grid-template-columns:repeat(2,1fr)}#pieceDetail{grid-template-columns:1fr;text-align:center;justify-items:center}}
-html.anim-off *,html.anim-off *::before,html.anim-off *::after{animation:none!important;transition:none!important}
-html.anim-off .rv{opacity:1!important;transform:none!important}
-html.anim-off .val .bar i{width:var(--w)!important}
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 700px at 78% -10%, #3a2f1e 0%, transparent 60%),
+    radial-gradient(900px 600px at 5% 110%, #26201a 0%, transparent 55%),
+    var(--bg-0);
+  color:var(--txt);
+  font-family:var(--f-body);
+  font-size:16px;
+  line-height:1.55;
+  overflow-x:hidden;
+}
+img{max-width:100%}
+button{font:inherit;color:inherit}
+h1,h2,h3{font-family:var(--f-disp);font-weight:800;line-height:1.05;margin:0 0 .4em}
+h1{font-size:clamp(2.1rem,7vw,4.4rem);letter-spacing:-.02em}
+h2{font-size:clamp(1.5rem,4.4vw,2.6rem);letter-spacing:-.015em}
+h3{font-size:clamp(1.05rem,2.6vw,1.35rem);letter-spacing:-.01em}
+p{margin:0 0 .9em}
+.lead{font-size:clamp(1rem,2.3vw,1.15rem);color:var(--txt-2);max-width:62ch}
+.small{font-size:.86rem;color:var(--txt-3)}
+.gold{color:var(--gold)}
+.eyebrow{
+  font-family:var(--f-mono);font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--gold-dim);display:flex;align-items:center;gap:10px;margin-bottom:14px;
+}
+.eyebrow::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent);max-width:120px}
+
+#app{min-height:100%;position:relative}
+
+/* ---- topo ---- */
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:var(--top);z-index:60;
+  display:flex;align-items:center;gap:12px;padding:0 14px;
+  background:linear-gradient(180deg,rgba(20,17,13,.96),rgba(20,17,13,.72));
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+}
+.brand{font-family:var(--f-disp);font-weight:800;font-size:.95rem;letter-spacing:-.01em;white-space:nowrap}
+.brand span{color:var(--gold)}
+/* barra de progresso em formato de fileira do tabuleiro */
+.pbar{flex:1;display:flex;gap:2px;height:14px;min-width:60px}
+.pbar i{
+  flex:1;border-radius:2px;background:var(--card);border:1px solid transparent;
+  transition:background .3s ease,transform .3s ease;
+}
+.pbar i.alt{background:#221c14}
+.pbar i.done{background:var(--gold-dim)}
+.pbar i.now{background:var(--gold);transform:scaleY(1.5)}
+.tb-btn{
+  background:var(--card);border:1px solid var(--line);color:var(--txt);
+  border-radius:var(--r-s);padding:7px 11px;font-size:.8rem;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;transition:.2s;white-space:nowrap
+}
+.tb-btn:hover{background:var(--card-2);border-color:var(--gold-dim)}
+.count{font-family:var(--f-mono);font-size:.75rem;color:var(--txt-3);white-space:nowrap}
+
+/* ---- telas ---- */
+.screen{
+  display:none;min-height:100vh;min-height:100dvh;
+  padding:calc(var(--top) + 20px) 18px calc(var(--bot) + 24px);
+  max-width:1180px;margin:0 auto;
+}
+.screen.active{display:block;animation:fadeUp .5s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:center}
+.grid2.tight{gap:20px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.center{text-align:center}
+.wrapc{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+
+/* ---- cartões ---- */
+.card{
+  background:linear-gradient(160deg,var(--card),var(--bg-2));
+  border:1px solid var(--line);border-radius:var(--r-m);padding:18px;
+  box-shadow:var(--sh-2);position:relative;overflow:hidden;
+}
+.card::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(160deg,rgba(255,255,255,.06),transparent 45%);
+}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.statcard{text-align:center;cursor:pointer;transition:transform .25s cubic-bezier(.2,.8,.3,1),border-color .25s}
+.statcard:hover,.statcard:focus-visible{transform:translateY(-6px) rotateX(4deg);border-color:var(--gold-dim)}
+.statcard .num{font-family:var(--f-disp);font-size:clamp(2.2rem,6vw,3.2rem);font-weight:800;color:var(--gold);line-height:1}
+.statcard .lbl{font-size:.9rem;color:var(--txt-2)}
+.statcard .hint{font-size:.82rem;color:var(--txt-3);max-height:0;opacity:0;overflow:hidden;transition:.35s}
+.statcard.open .hint,.statcard:hover .hint{max-height:120px;opacity:1;margin-top:8px}
+
+.pill{
+  display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);
+  border-radius:999px;padding:7px 14px;font-size:.85rem;color:var(--txt-2)
+}
+.pill.gold{border-color:var(--gold-dim);color:var(--gold-2)}
+
+/* ---- botões ---- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  background:linear-gradient(180deg,var(--gold-2),var(--gold));color:#2a1e06;
+  border:none;border-radius:999px;padding:13px 26px;font-weight:700;font-size:1rem;
+  cursor:pointer;box-shadow:0 6px 18px rgba(233,185,73,.25);transition:transform .18s,box-shadow .18s;
+  text-decoration:none;
+  font-family:var(--f-disp);letter-spacing:.01em;min-height:46px;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(233,185,73,.34)}
+.btn:active{transform:translateY(0)}
+.btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line);box-shadow:none}
+.btn.ghost:hover{border-color:var(--gold-dim);background:var(--card)}
+.btn.sm{padding:9px 16px;font-size:.85rem;min-height:38px}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:6px}
+
+/* ---- navegação inferior ---- */
+.navbar{
+  position:fixed;left:0;right:0;bottom:0;height:var(--bot);z-index:60;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+  background:linear-gradient(0deg,rgba(20,17,13,.97),rgba(20,17,13,.75));
+  backdrop-filter:blur(8px);border-top:1px solid var(--line);
+}
+.nav-title{
+  flex:1;text-align:center;font-family:var(--f-mono);font-size:.72rem;letter-spacing:.1em;
+  color:var(--txt-3);text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+.nav-btn{
+  width:54px;height:54px;border-radius:16px;background:var(--card);border:1px solid var(--line);
+  color:var(--txt);font-size:1.3rem;cursor:pointer;display:grid;place-items:center;transition:.2s;flex:none
+}
+.nav-btn:hover:not(:disabled){background:var(--card-2);border-color:var(--gold-dim);color:var(--gold)}
+.nav-btn:disabled{opacity:.32;cursor:not-allowed}
+
+/* ---- menu ---- */
+.menu{
+  position:fixed;inset:0;z-index:80;background:rgba(12,10,7,.92);backdrop-filter:blur(6px);
+  display:none;padding:22px;overflow:auto
+}
+.menu.open{display:block;animation:fadeUp .3s ease both}
+.menu-inner{max-width:900px;margin:0 auto}
+.menu-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-top:16px}
+.menu-item{
+  display:flex;align-items:center;gap:10px;text-align:left;width:100%;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-s);
+  padding:11px 12px;cursor:pointer;transition:.18s;font-size:.9rem;color:var(--txt-2)
+}
+.menu-item:hover{border-color:var(--gold-dim);color:var(--txt);transform:translateX(3px)}
+.menu-item.current{border-color:var(--gold);color:var(--gold-2)}
+.menu-item b{font-family:var(--f-mono);font-size:.75rem;color:var(--gold-dim);flex:none}
+
+/* ============================================================
+   3. TABULEIRO
+   ============================================================ */
+.board-wrap{
+  display:grid;grid-template-columns:18px 1fr;grid-template-rows:1fr 18px;
+  gap:4px;width:min(100%,var(--bw,440px));margin:0 auto;
+}
+.board-wrap.nocoord{grid-template-columns:1fr;grid-template-rows:1fr}
+.ranks{display:grid;grid-template-rows:repeat(8,1fr);font-family:var(--f-mono);font-size:.65rem;color:var(--txt-3)}
+.ranks span{display:grid;place-items:center}
+.files{grid-column:2;display:grid;grid-template-columns:repeat(8,1fr);font-family:var(--f-mono);font-size:.65rem;color:var(--txt-3)}
+.files span{display:grid;place-items:center}
+.board{
+  grid-column:2;grid-row:1;display:grid;
+  grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);
+  aspect-ratio:1/1;border-radius:8px;overflow:hidden;
+  border:5px solid #4a3722;
+  box-shadow:var(--sh-3),inset 0 0 0 1px rgba(0,0,0,.4);
+  background:var(--wood-l);position:relative;
+}
+.board-wrap.nocoord .board{grid-column:1;grid-row:1}
+.sq{
+  position:relative;display:grid;place-items:center;
+  transition:background-color .25s ease;
+}
+.sq.l{background:linear-gradient(150deg,#f0dcb6,var(--wood-l))}
+.sq.d{background:linear-gradient(150deg,#95693a,var(--wood-d))}
+.sq.pick{cursor:pointer}
+.sq .coord{
+  position:absolute;top:2px;left:3px;font-family:var(--f-mono);font-size:.5rem;
+  color:rgba(0,0,0,.42);opacity:0;transition:opacity .2s;pointer-events:none
+}
+.board.showcoords .sq .coord{opacity:1}
+.sq.hl{background:linear-gradient(150deg,#f5d271,#e2b243)!important}
+.sq.hl-soft{box-shadow:inset 0 0 0 3px rgba(233,185,73,.75)}
+.sq.good{background:linear-gradient(150deg,#7ad396,#4aa869)!important}
+.sq.bad{background:linear-gradient(150deg,#ef8b84,#cf5148)!important}
+.sq.center-hl{animation:pulseC 1.8s ease-in-out infinite}
+@keyframes pulseC{0%,100%{box-shadow:inset 0 0 0 0 rgba(233,185,73,0)}50%{box-shadow:inset 0 0 22px 5px rgba(233,185,73,.75)}}
+.sq.file-hl{background:linear-gradient(150deg,#cfe3f5,#9dbfe0)!important}
+.sq.rank-hl{background:linear-gradient(150deg,#f5d9cf,#e0b09d)!important}
+
+/* marcadores de movimento */
+.dot{
+  position:absolute;left:50%;top:50%;width:30%;height:30%;margin:-15% 0 0 -15%;
+  border-radius:50%;box-sizing:border-box;
+  background:rgba(24,18,10,.42);box-shadow:0 0 0 2px rgba(233,185,73,.55) inset;
+  animation:pop .3s cubic-bezier(.2,1.4,.4,1) both;pointer-events:none;z-index:2
+}
+.dot.cap{
+  width:88%;height:88%;margin:-44% 0 0 -44%;background:transparent;
+  box-shadow:inset 0 0 0 5px rgba(224,100,92,.9)
+}
+@keyframes pop{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
+.arrowlay{position:absolute;inset:0;pointer-events:none;z-index:4}
+
+/* peças */
+.pc{
+  width:86%;height:86%;display:block;position:relative;z-index:3;
+  filter:drop-shadow(0 3px 3px rgba(0,0,0,.45));
+  transition:transform .3s cubic-bezier(.2,.8,.3,1)
+}
+.pc.w{--fill:#f7f1e4;--stroke:#2b2117}
+.pc.b{--fill:#231d15;--stroke:#d9cdb6}
+.pc{pointer-events:none}
+.pc.clickable{cursor:pointer;pointer-events:auto}
+.pc.clickable:hover{transform:translateY(-5px) scale(1.06)}
+.pc.sel{filter:drop-shadow(0 0 8px var(--gold)) drop-shadow(0 3px 3px rgba(0,0,0,.5))}
+.pc.drop{animation:drop .5s cubic-bezier(.2,1.2,.4,1) both}
+@keyframes drop{from{transform:translateY(-58px) scale(.6);opacity:0}to{transform:none;opacity:1}}
+.pc.fade{animation:fadeout .35s ease forwards}
+@keyframes fadeout{to{transform:scale(.3) rotate(28deg);opacity:0}}
+.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+
+/* leitura / feedback */
+.readout{
+  min-height:46px;display:flex;align-items:center;justify-content:center;gap:8px;
+  font-family:var(--f-mono);font-size:1rem;color:var(--gold-2);
+  background:var(--bg-2);border:1px dashed var(--line);border-radius:var(--r-s);padding:10px 14px;text-align:center
+}
+.readout.ok{color:var(--ok);border-color:var(--ok);border-style:solid}
+.readout.no{color:var(--no);border-color:var(--no);border-style:solid}
+
+/* ============================================================
+   4. COMPONENTES DE CONTEÚDO
+   ============================================================ */
+/* capa */
+.cover{display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center;min-height:calc(100vh - var(--top) - var(--bot) - 40px)}
+.cover h1{margin-bottom:.15em}
+.cover .sub{font-family:var(--f-disp);font-size:clamp(1rem,2.6vw,1.5rem);color:var(--gold-2);font-weight:400;letter-spacing:.04em}
+.cover .board{border-width:8px}
+.tilt{transform:perspective(1100px) rotateX(16deg) rotateZ(-4deg);transition:transform 1.2s cubic-bezier(.2,.8,.3,1)}
+.tilt.settled{transform:perspective(1100px) rotateX(7deg) rotateZ(-2deg)}
+
+/* linha do tempo */
+.tl{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap;justify-content:center;position:relative}
+.tl-node{
+  flex:1 1 130px;min-width:120px;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--r-m);padding:14px 12px;cursor:pointer;text-align:center;transition:.25s;position:relative
+}
+.tl-node:hover{transform:translateY(-4px);border-color:var(--gold-dim)}
+.tl-node.on{border-color:var(--gold);background:var(--card-2);box-shadow:0 0 0 1px var(--gold-dim),var(--sh-2)}
+.tl-node .ico{font-size:1.6rem;line-height:1}
+.tl-node .yr{font-family:var(--f-mono);font-size:.68rem;color:var(--gold-dim);margin-top:4px}
+.tl-node .nm{font-family:var(--f-disp);font-weight:700;font-size:.95rem;margin-top:2px}
+.tl-line{height:2px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:14px 0}
+
+/* evolução (comparativo) */
+.evo{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.evo-card{text-align:center;transition:.3s}
+.evo-card .art{height:120px;display:grid;place-items:center;margin-bottom:10px}
+.evo-card.dim{opacity:.42;filter:grayscale(.6)}
+
+/* peças: seletor */
+.piecebar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.pbtn{
+  width:74px;height:74px;border-radius:var(--r-m);background:var(--card);border:1px solid var(--line);
+  display:grid;place-items:center;cursor:pointer;transition:.22s;padding:6px
+}
+.pbtn svg{width:100%;height:100%}
+.pbtn:hover{transform:translateY(-5px);border-color:var(--gold-dim);background:var(--card-2)}
+.pbtn.on{border-color:var(--gold);background:var(--card-2);box-shadow:0 0 20px rgba(233,185,73,.18)}
+.pdetail{display:grid;grid-template-columns:130px 1fr;gap:18px;align-items:center;min-height:150px}
+.pdetail .big{width:130px;height:130px;animation:pop .4s cubic-bezier(.2,1.3,.4,1) both}
+
+/* valores */
+.valrow{display:flex;align-items:center;gap:14px}
+.valrow .bar{flex:1;height:12px;border-radius:999px;background:var(--bg-2);overflow:hidden;border:1px solid var(--line)}
+.valrow .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold-dim),var(--gold-2));transition:width 1s cubic-bezier(.2,.8,.3,1)}
+.valrow .v{font-family:var(--f-disp);font-weight:800;font-size:1.3rem;color:var(--gold);width:46px;text-align:right}
+.valrow svg{width:40px;height:40px;flex:none}
+.valrow .nm{width:74px;font-size:.9rem;color:var(--txt-2)}
+
+/* passos */
+.steps{display:grid;gap:12px}
+.step{
+  display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:center;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);padding:14px;
+  opacity:0;transform:translateY(12px);transition:.5s
+}
+.step.in{opacity:1;transform:none}
+.step .n{
+  width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
+  font-family:var(--f-disp);font-weight:800;background:var(--bg-2);color:var(--gold);border:1px solid var(--gold-dim)
+}
+
+/* quiz */
+.quiz-q{font-family:var(--f-disp);font-size:clamp(1.1rem,3vw,1.5rem);font-weight:700;margin-bottom:14px}
+.opts{display:grid;gap:10px}
+.opt{
+  text-align:left;background:var(--card);border:1px solid var(--line);border-radius:var(--r-s);
+  padding:14px 16px;cursor:pointer;transition:.18s;display:flex;gap:12px;align-items:center;min-height:52px
+}
+.opt:hover:not(:disabled){border-color:var(--gold-dim);background:var(--card-2)}
+.opt:disabled{cursor:default}
+.opt .k{
+  font-family:var(--f-mono);font-size:.8rem;width:26px;height:26px;border-radius:7px;flex:none;
+  background:var(--bg-2);display:grid;place-items:center;color:var(--gold-dim);border:1px solid var(--line)
+}
+.opt.right{border-color:var(--ok);background:rgba(95,191,125,.14)}
+.opt.wrong{border-color:var(--no);background:rgba(224,100,92,.13)}
+.scorebox{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+.qprog{height:8px;border-radius:999px;background:var(--bg-2);overflow:hidden;border:1px solid var(--line);flex:1;min-width:120px}
+.qprog i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold-2));width:0;transition:width .4s}
+
+/* confete */
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:70;overflow:hidden}
+.confetti i{
+  position:absolute;width:9px;height:14px;top:-20px;border-radius:2px;
+  animation:fall linear forwards
+}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:.15}}
+
+/* tabela */
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+th{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-dim)}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.chip{
+  background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;
+  cursor:pointer;font-size:.85rem;transition:.18s;min-height:38px
+}
+.chip:hover{border-color:var(--gold-dim)}
+.chip.on{background:var(--gold);color:#2a1e06;border-color:var(--gold);font-weight:600}
+
+.toast{
+  position:fixed;left:50%;bottom:calc(var(--bot) + 16px);transform:translateX(-50%) translateY(16px);
+  background:var(--card-2);border:1px solid var(--gold-dim);color:var(--txt);
+  padding:11px 18px;border-radius:999px;z-index:75;opacity:0;transition:.3s;pointer-events:none;
+  font-size:.9rem;box-shadow:var(--sh-2);max-width:90vw;text-align:center
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ============================================================
+   5. RESPONSIVIDADE
+   ============================================================ */
+@media (max-width:900px){
+  .grid2,.cover{grid-template-columns:1fr;gap:20px}
+  /* no celular o tabuleiro vem primeiro: menos rolagem até a parte interativa */
+  .grid2>.board-wrap{order:-1}
+
+  .cover{min-height:0}
+  .cover .art{order:-1}
+  .tilt{transform:perspective(900px) rotateX(8deg)}
+  .tilt.settled{transform:none}
+  .pdetail{grid-template-columns:96px 1fr;gap:12px}
+  .pdetail .big{width:96px;height:96px}
+}
+@media (max-width:560px){
+  :root{--top:52px;--bot:74px}
+  .cover .art .board-wrap{--bw:min(72%,250px)!important}
+  .pbar{display:none}
+  body{font-size:15px}
+  .screen{padding-left:14px;padding-right:14px}
+  .brand{font-size:.82rem}
+  .brand small{display:none}
+  .card{padding:14px}
+  .pbtn{width:60px;height:60px}
+  .nav-btn{width:48px;height:48px;border-radius:14px}
+  .board-wrap{grid-template-columns:14px 1fr;grid-template-rows:1fr 14px}
+  .valrow .nm{width:56px;font-size:.8rem}
+  .valrow svg{width:32px;height:32px}
+  .menu-list{grid-template-columns:1fr}
+}
+@media (max-height:560px) and (orientation:landscape){
+  .cover{min-height:0}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  .tilt,.tilt.settled{transform:none}
+}
 </style>
-<noscript><style>.slide{display:block!important;position:static!important}header.top,nav.bottom{display:none!important}</style></noscript>
 </head>
 <body>
-<div class="bg" aria-hidden="true"><span class="fp f1">♞</span><span class="fp f2">♛</span><span class="fp f3">♜</span></div>
-<header class="top">
-  <div class="brand"><span class="bp">♟</span> Xadrez <small>· Introdução interativa</small></div>
-  <div class="top-actions">
-    <button class="tbtn" id="animBtn" type="button" aria-pressed="true" aria-label="Ativar ou desativar animações">🎬 <span id="animLbl">ON</span></button>
-    <button class="tbtn" id="soundBtn" type="button" aria-label="Som" aria-pressed="true">🔊</button>
-    <button class="tbtn" id="menuBtn" type="button" aria-label="Menu (Esc)">☰</button>
-  </div>
-  <div id="progress" role="progressbar" aria-label="Progresso"></div>
+<!-- ============================================================
+     PEÇAS EM SVG (desenhadas no próprio arquivo, sem imagens externas)
+     ============================================================ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<defs>
+  <symbol id="pc-k" viewBox="0 0 45 45">
+    <g fill="var(--fill)" stroke="var(--stroke)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M20.8 3.2h3.4v3.6h3.6v3.4h-3.6v4.4h-3.4V10.2h-3.6V6.8h3.6z"/>
+      <path d="M22.5 14.2c-4.7 0-8.4 3.3-8.4 7.3 0 2 .9 3.4 1.8 4.3h13.2c.9-.9 1.8-2.3 1.8-4.3 0-4-3.7-7.3-8.4-7.3z"/>
+      <path d="M15.6 25.6c-1.5 3.4-2.4 6.5-2.4 9.4h18.6c0-2.9-.9-6-2.4-9.4z"/>
+      <rect x="11.4" y="34.6" width="22.2" height="5" rx="1.8"/>
+    </g>
+  </symbol>
+  <symbol id="pc-q" viewBox="0 0 45 45">
+    <g fill="var(--fill)" stroke="var(--stroke)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M9 15.5 12.6 24h19.8L36 15.5 31.4 20 28 11l-3.4 7.5L22.5 8l-2.1 10.5L17 11l-3.4 9z"/>
+      <circle cx="9" cy="14" r="2.1"/><circle cx="17" cy="9.6" r="2.1"/><circle cx="22.5" cy="6.6" r="2.3"/>
+      <circle cx="28" cy="9.6" r="2.1"/><circle cx="36" cy="14" r="2.1"/>
+      <path d="M13 24.5c-1 4-1.5 7.5-1.5 10.5h22c0-3-.5-6.5-1.5-10.5z"/>
+      <rect x="10" y="34.8" width="25" height="4.8" rx="1.7"/>
+    </g>
+  </symbol>
+  <symbol id="pc-r" viewBox="0 0 45 45">
+    <g fill="var(--fill)" stroke="var(--stroke)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M11 14h4v3.5h4.5V14h5v3.5H29V14h4v8l-2.5 2.5v9L33 36v3H11v-3l2.5-2.5v-9L11 22z"/>
+      <path d="M13.5 24.5h18M13.5 33.5h18" fill="none"/>
+    </g>
+  </symbol>
+  <symbol id="pc-b" viewBox="0 0 45 45">
+    <g fill="var(--fill)" stroke="var(--stroke)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+      <circle cx="22.5" cy="7.6" r="2.4"/>
+      <path d="M22.5 10c4.2 0 7.8 4.6 7.8 9.2 0 3.4-1.9 5.3-3.4 6.3h-8.8c-1.5-1-3.4-2.9-3.4-6.3 0-4.6 3.6-9.2 7.8-9.2z"/>
+      <path d="M20.2 16.4 25 13" fill="none"/>
+      <rect x="14.6" y="25.8" width="15.8" height="3.6" rx="1.5"/>
+      <path d="M11.5 34.8c2.6-1.6 4-3.2 4-5.4h14c0 2.2 1.4 3.8 4 5.4z"/>
+      <rect x="10.3" y="34.8" width="24.4" height="4.8" rx="1.7"/>
+    </g>
+  </symbol>
+  <symbol id="pc-n" viewBox="0 0 45 45">
+    <g fill="var(--fill)" stroke="var(--stroke)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M23 10c9.6 1.3 15.2 8.6 14.6 26H17c0-3.2 2.3-5.3 3.8-8.1 1.5-2.8-.7-4.8-2.8-3.1-2.9 2.4-5.9 3.4-8.4 2.2-2.2-1-1.5-3.7.6-5.6 2.9-2.4 4.8-5.2 6.1-8 .9-1.8 2-3.2 3.9-3.9L21 7z"/>
+      <ellipse cx="15.4" cy="19.2" rx="1.4" ry="1.7" fill="var(--stroke)" stroke="none"/>
+      <circle cx="11.2" cy="25.4" r="1" fill="var(--stroke)" stroke="none"/>
+      <rect x="9.5" y="35.6" width="26" height="4.4" rx="1.7"/>
+    </g>
+  </symbol>
+  <symbol id="pc-p" viewBox="0 0 45 45">
+    <g fill="var(--fill)" stroke="var(--stroke)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+      <circle cx="22.5" cy="12" r="5.2"/>
+      <path d="M22.5 18c-3.4 0-6 2.1-6 4.4 0 2 1.6 2.9 1.6 4.7 0 3.2-2.4 5.6-4.1 7.9h17c-1.7-2.3-4.1-4.7-4.1-7.9 0-1.8 1.6-2.7 1.6-4.7 0-2.3-2.6-4.4-6-4.4z"/>
+      <rect x="11" y="34.8" width="23" height="4.6" rx="1.7"/>
+    </g>
+  </symbol>
+</defs>
+</svg>
+
+<!-- ============================================================
+     TOPO: marca, progresso e menu
+     ============================================================ -->
+<header class="topbar">
+  <div class="brand">♟ <span>Xadrez</span> <small>· aula interativa</small></div>
+  <div class="pbar" id="pbar" role="progressbar" aria-label="Progresso da aula" aria-valuemin="1" aria-valuemax="25" aria-valuenow="1"></div>
+  <span class="count" id="count">01/25</span>
+  <button class="tb-btn" id="btnSound" aria-pressed="true" title="Ligar ou desligar os sons">🔊<span class="sr"> som</span></button>
+  <button class="tb-btn" id="btnMenu" aria-haspopup="dialog">☰ <span class="sr">Abrir </span>Menu</button>
 </header>
-<main id="slides">
-<section class="slide" data-title="Capa"><div class="cover">
-  <div class="board-wrap"><div id="board1"></div></div>
-  <h1>♟️ INTRODUÇÃO <span class="g">AO XADREZ</span></h1>
-  <p class="tag">APRENDA · PENSE · ANTECIPE · JOGUE</p>
-  <button class="btn" id="startBtn" type="button">COMEÇAR ▶</button>
-</div></section>
-<section class="slide" data-title="O que é o xadrez?"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">PRIMEIROS PASSOS</span><h2>O QUE É O XADREZ?</h2><p class="sub">Um jogo de estratégia para duas pessoas. Passe o mouse (ou toque) nos cartões!</p></div>
-  <div class="stat-cards rv" style="--i:1" id="statCards">
-    <button class="stat" type="button"><span class="ico">🧑‍🤝🧑</span><span class="num" data-count="2">0</span><span class="lbl">JOGADORES</span><span class="tip">Brancas × Pretas</span></button>
-    <button class="stat" type="button"><span class="ico">🟫</span><span class="num" data-count="64">0</span><span class="lbl">CASAS</span><span class="tip">8 × 8</span></button>
-    <button class="stat" type="button"><span class="ico">♟</span><span class="num" data-count="32">0</span><span class="lbl">PEÇAS</span><span class="tip">16 + 16</span></button>
-    <button class="stat" type="button"><span class="ico">🏆</span><span class="num" data-count="1">0</span><span class="lbl">OBJETIVO</span><span class="tip">Xeque-mate!</span></button>
+
+<!-- MENU DE SEÇÕES -->
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Menu de seções">
+  <div class="menu-inner">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+      <h2 style="margin:0">Seções da aula</h2>
+      <button class="btn ghost sm" id="btnCloseMenu">Fechar (ESC)</button>
+    </div>
+    <p class="small">Escolha um assunto para ir direto até ele.</p>
+    <div class="menu-list" id="menuList"></div>
   </div>
-</div></section>
-<section class="slide" data-title="De onde veio?"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">HISTÓRIA</span><h2>DE ONDE VEIO O XADREZ?</h2><p class="sub">Clique em cada época da linha do tempo! 👇</p></div>
-  <div class="timeline rv" style="--i:1" id="timeline">
-    <button class="t-node on" type="button" data-i="0"><span class="dot">🐘</span><span class="tl-lbl">ÍNDIA</span></button>
-    <button class="t-node" type="button" data-i="1"><span class="dot">👑</span><span class="tl-lbl">PÉRSIA</span></button>
-    <button class="t-node" type="button" data-i="2"><span class="dot">🌙</span><span class="tl-lbl">MUNDO ÁRABE</span></button>
-    <button class="t-node" type="button" data-i="3"><span class="dot">🏰</span><span class="tl-lbl">EUROPA</span></button>
-    <button class="t-node" type="button" data-i="4"><span class="dot">🌐</span><span class="tl-lbl">MODERNO</span></button>
+</div>
+
+<main id="app">
+
+<!-- ============ 01 · CAPA ============ -->
+<section class="screen" id="s1" aria-label="Capa">
+  <div class="cover">
+    <div>
+      <div class="eyebrow">Ensino Fundamental · Primeiro contato</div>
+      <h1>Introdução<br>ao <span class="gold">Xadrez</span></h1>
+      <p class="sub" style="font-family:var(--f-disp);font-size:clamp(1rem,2.6vw,1.5rem);color:var(--gold-2);margin:0 0 .5em">Aprenda. Pense. Antecipe. Jogue.</p>
+      <p class="lead" style="margin-top:14px">Um jogo de 64 casas em que ninguém depende da sorte: tudo o que acontece no tabuleiro vem de uma decisão sua.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:18px">
+        <button class="btn" id="btnStart">COMEÇAR ♟</button>
+        <button class="btn ghost" id="btnMenu2">Ver todas as seções</button>
+      </div>
+      <p class="small" style="margin-top:16px">Use as setas <b>←</b> e <b>→</b> do teclado para navegar. <b>ESC</b> abre o menu.</p>
+    </div>
+    <div class="art">
+      <div class="board-wrap nocoord tilt" id="coverWrap" style="--bw:min(100%,420px)">
+        <div class="board" id="boardCover" aria-hidden="true"></div>
+      </div>
+    </div>
   </div>
-  <div class="panel rv" style="--i:2" id="tlDetail" aria-live="polite"></div>
-</div></section>
-<section class="slide" data-title="Evolução do jogo"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">HISTÓRIA</span><h2>A EVOLUÇÃO DO JOGO</h2><p class="sub">Toque nas abas para viajar no tempo! ⏳</p></div>
-  <div class="era-tabs rv" style="--i:1">
-    <button class="era-btn on" type="button" data-i="0">🐘 Chaturanga</button>
-    <button class="era-btn" type="button" data-i="1">🏰 Medieval</button>
-    <button class="era-btn" type="button" data-i="2">⏱️ Moderno</button>
+</section>
+
+<!-- ============ 02 · O QUE É ============ -->
+<section class="screen" id="s2" aria-label="O que é o xadrez">
+  <div class="eyebrow">Seção 02</div>
+  <h2>O que é o xadrez?</h2>
+  <p class="lead">Uma disputa entre duas pessoas sobre um tabuleiro quadrado. Não existem dados nem cartas: cada jogador decide a própria jogada e depois vive as consequências dela. Toque nos cartões para ver o detalhe de cada número.</p>
+  <div class="cards" id="statCards" style="margin-top:18px"></div>
+  <div class="card" style="margin-top:18px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+    <span class="pill gold">Objetivo</span>
+    <p style="margin:0">Dar <b>xeque-mate</b> no rei adversário, ou seja, atacar o rei de um jeito que ele não tenha nenhuma saída legal.</p>
   </div>
-  <div class="era-panel on rv" style="--i:2" data-i="0"><div><div id="eraBoard0" class="board mini"></div></div>
-    <div><h3>Chaturanga (Índia)</h3><p>Há cerca de 1.500 anos jogava-se na Índia o <b>Chaturanga</b> — geralmente considerado <b>um dos principais ancestrais do xadrez</b>.</p><ul><li>🐘 Elefante · 🐴 Cavalo · 🛺 Biga · ⚔️ Soldado</li></ul></div></div>
-  <div class="era-panel rv" style="--i:2" data-i="1"><div><div id="eraBoard1" class="board mini"></div></div>
-    <div><h3>Xadrez medieval (Europa)</h3><p>O jogo viajou pela Pérsia e pelo mundo árabe (o <b>Shatranj</b>) e chegou à Europa, onde virou febre entre a nobreza.</p><ul><li>👑 Rei · 👸 Dama · 🏰 Torre · ⛪ Bispo</li><li>⚠️ Dama e bispo se moviam bem menos!</li></ul></div></div>
-  <div class="era-panel rv" style="--i:2" data-i="2"><div><div id="eraBoard2" class="board mini"></div></div>
-    <div><h3>Xadrez moderno</h3><p>No <b>século XV</b> dama e bispo ganharam movimentos poderosos; no <b>XIX</b> surgiram torneios e o relógio ⏱️. Hoje o mundo inteiro joga — até on-line!</p></div></div>
-</div></section>
-<section class="slide" data-title="O tabuleiro"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">O CAMPO DE BATALHA</span><h2>CONHECENDO O TABULEIRO</h2><p class="sub"><b>8 colunas</b> (a–h) · <b>8 fileiras</b> (1–8) · <b>64 casas</b>. Toque em uma casa!</p></div>
-  <div class="split">
-    <div id="board5" class="rv" style="--i:1"></div>
-    <div class="panel rv" style="--i:2"><p style="color:var(--muted);margin-bottom:8px">Casa selecionada:</p>
-      <div class="msg gold" id="coordReadout" style="font-size:44px;font-family:var(--disp)">—</div>
-      <p style="color:var(--muted);font-size:14px;margin-top:10px">Nome = <b style="color:var(--gold)">letra</b> da coluna + <b style="color:var(--gold)">número</b> da fileira. Ex.: <b style="color:var(--gold)">e4</b>.</p></div>
+</section>
+
+<!-- ============ 03 · ORIGEM ============ -->
+<section class="screen" id="s3" aria-label="De onde veio o xadrez">
+  <div class="eyebrow">Seção 03</div>
+  <h2>De onde veio o xadrez?</h2>
+  <p class="lead">O xadrez não foi inventado por uma única pessoa em um único dia. Ele foi mudando de mãos, de país e de regras ao longo de muitos séculos. Clique em cada etapa da linha do tempo.</p>
+  <div class="tl" id="timeline" style="margin:18px 0"></div>
+  <div class="card" id="tlInfo" style="min-height:120px">
+    <p style="margin:0;color:var(--txt-3)">Selecione uma etapa acima.</p>
   </div>
-</div></section>
-<section class="slide" data-title="Desafio: encontre a casa"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">DESAFIO 🎯</span><h2>ENCONTRE A CASA!</h2><p class="sub" id="findPrompt"></p></div>
-  <div id="board6" class="rv" style="--i:1"></div>
-  <div class="msg" id="findMsg" aria-live="polite"></div>
-  <div class="ctr"><button class="btn ghost small" id="findNextBtn" type="button" hidden>🎲 Sortear outra casa</button></div>
-</div></section>
-<section class="slide" data-title="Posição do tabuleiro"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">ANTES DE JOGAR</span><h2>COMO POSICIONAR O TABULEIRO?</h2><p class="sub">Regra de ouro: <b style="color:var(--gold)">“CASA BRANCA À DIREITA!”</b> Toque no tabuleiro correto!</p></div>
-  <div class="orient-row rv" style="--i:1">
-    <div class="orient-item" id="orientA"><div class="olbl">A</div><div id="board7a" class="board mini"></div></div>
-    <div class="orient-item" id="orientB"><div class="olbl">B</div><div id="board7b" class="board mini"></div></div>
+  <p class="small" style="margin-top:14px">Historiadores concordam que o <b>Chaturanga</b>, praticado na Índia, é geralmente apontado como um dos principais ancestrais do xadrez. Datas e caminhos exatos ainda são objeto de estudo e discussão, portanto trate esta linha do tempo como um resumo aproximado, e não como uma certeza fechada.</p>
+</section>
+
+<!-- ============ 04 · EVOLUÇÃO ============ -->
+<section class="screen" id="s4" aria-label="A evolução do jogo">
+  <div class="eyebrow">Seção 04</div>
+  <h2>A evolução do jogo</h2>
+  <p class="lead">Três retratos do mesmo jogo em momentos diferentes. Use os botões para atravessar o tempo e observe o que muda no tabuleiro e nas peças.</p>
+  <div class="chips" id="evoChips" style="margin:16px 0"></div>
+  <div class="evo" id="evoCards"></div>
+  <div class="card" style="margin-top:16px">
+    <p style="margin:0" id="evoText"></p>
   </div>
-  <div class="msg" id="orientMsg" aria-live="polite"></div>
-</div></section>
-<section class="slide" data-title="Conhecendo as peças"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">O EXÉRCITO</span><h2>CONHECENDO AS PEÇAS</h2><p class="sub">Clique em cada peça!</p></div>
-  <div class="piece-grid rv" style="--i:1">
-    <button class="piece-card" type="button" data-p="k"><span class="big">♚</span><span class="pn">Rei</span></button>
-    <button class="piece-card" type="button" data-p="q"><span class="big">♛</span><span class="pn">Dama</span></button>
-    <button class="piece-card" type="button" data-p="r"><span class="big">♜</span><span class="pn">Torre</span></button>
-    <button class="piece-card" type="button" data-p="b"><span class="big">♝</span><span class="pn">Bispo</span></button>
-    <button class="piece-card" type="button" data-p="n"><span class="big">♞</span><span class="pn">Cavalo</span></button>
-    <button class="piece-card" type="button" data-p="p"><span class="big">♟</span><span class="pn">Peão</span></button>
+</section>
+
+<!-- ============ 05 · TABULEIRO ============ -->
+<section class="screen" id="s5" aria-label="Conhecendo o tabuleiro">
+  <div class="eyebrow">Seção 05</div>
+  <h2>Conhecendo o tabuleiro</h2>
+  <div class="grid2">
+    <div class="stack">
+      <p class="lead">O tabuleiro tem <b>64 casas</b>, alternando claras e escuras. As <b>colunas</b> são as oito filas verticais, marcadas por letras de <b>a</b> até <b>h</b>. As <b>fileiras</b> são as oito filas horizontais, numeradas de <b>1</b> a <b>8</b>. Juntando a letra e o número, cada casa ganha um nome só dela.</p>
+      <div class="chips" id="boardChips"></div>
+      <div class="readout" id="sqReadout">Passe o dedo ou o mouse sobre uma casa.</div>
+      <p class="small">Este endereço de casas é a linguagem oficial do xadrez: quem sabe ler <b>e4</b> consegue acompanhar qualquer partida escrita em qualquer lugar do mundo.</p>
+    </div>
+    <div class="board-wrap" id="wrap5" style="--bw:430px">
+      <div class="ranks" id="ranks5"></div>
+      <div class="board showcoords" id="board5" role="grid" aria-label="Tabuleiro com coordenadas"></div>
+      <div class="files" id="files5"></div>
+    </div>
   </div>
-  <div class="panel rv" style="--i:2" id="pieceDetail" aria-live="polite"><span class="huge">♟️</span><div><h3>Escolha uma peça!</h3><p style="color:var(--muted)">Cada uma tem um jeito próprio de se mover. 😄</p></div></div>
-</div></section>
-<section class="slide" data-title="Posição inicial"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">MONTAGEM</span><h2>A POSIÇÃO INICIAL</h2><p class="sub"><span class="chip"><b>16</b> brancas</span> <span class="chip"><b>16</b> pretas</span> — clique numa peça para ver o nome!</p></div>
-  <div id="board9" class="rv" style="--i:1"></div>
-  <div class="msg gold" id="nameReadout" aria-live="polite">&nbsp;</div>
-</div></section>
-<section class="slide" data-title="A regra da dama"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">TRUQUE DE MONTAGEM</span><h2>A REGRA DA DAMA</h2><p class="sub">“<b style="color:var(--gold)">DAMA FICA NA SUA PRÓPRIA COR.</b>” Branca em d1 (clara); preta em d8 (escura).</p></div>
-  <div id="board10" class="rv" style="--i:1"></div>
-  <div class="msg gold rv" style="--i:2">👸 Cada dama na sua cor!</div>
-</div></section>
-<section class="slide" data-title="O Rei"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">PEÇA POR PEÇA · 1/6</span><h2>O REI ♚</h2><p class="sub">Anda <b>uma casa</b> em qualquer direção — e nunca entra em casa atacada! A torre preta está de olho… 👀</p></div>
-  <div class="split"><div id="board11" class="rv" style="--i:1"></div>
-    <div class="panel rv" style="--i:2"><div class="msg gold" id="kingMsg" aria-live="polite">Toque numa casa dourada!</div>
-      <p style="color:var(--muted);font-size:14px;margin:10px 0">⚠️ A fileira 5 está atacada pela torre!</p>
-      <button class="btn ghost small" id="kingReset" type="button">🔄 Reiniciar</button></div></div>
-</div></section>
-<section class="slide" data-title="A Dama"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">PEÇA POR PEÇA · 2/6</span><h2>A DAMA ♛</h2><p class="sub">A dama junta os poderes da <b>torre</b> e do <b>bispo</b>. Clique num destino dourado!</p></div>
-  <div class="split"><div id="board12" class="rv" style="--i:1"></div>
-    <div class="panel rv" style="--i:2">
-      <div class="formula" aria-label="Dama é igual a torre mais bispo"><span class="fw">♜</span><small>Torre</small><span class="op">+</span><span class="fw">♝</span><small>Bispo</small><span class="op">=</span><span class="fw g">♛</span><small>Dama</small></div>
-      <div class="msg gold" id="queenMsg" aria-live="polite">Setas azuis = parte torre; verdes = parte bispo!</div>
-      <p style="color:var(--muted);font-size:14px;margin:10px 0">O peão d6 bloqueia; o cavalo g7 pode ser capturado! 🎯</p>
-      <button class="btn ghost small" id="queenReset" type="button">🔄 Reiniciar</button></div></div>
-</div></section>
-<section class="slide" data-title="A Torre"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">PEÇA POR PEÇA · 3/6</span><h2>A TORRE ♜</h2><p class="sub">Anda em linha reta ⬆️️⬅️➡️ — <b style="color:var(--bad)">NÃO na diagonal!</b> Qual casa com “?” ela alcança?</p></div>
-  <div class="split"><div id="board13" class="rv" style="--i:1"></div>
-    <div class="panel rv" style="--i:2"><div class="msg" id="rookMsg" aria-live="polite">Pense: o que bloqueia? 🤔</div>
-      <button class="btn ghost small" id="rookReset" type="button" hidden>🔄 Reiniciar</button></div></div>
-</div></section>
-<section class="slide" data-title="O Bispo"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">PEÇA POR PEÇA · 4/6</span><h2>O BISPO ♝</h2><p class="sub">Só anda na <b>diagonal</b> — <b style="color:var(--gold)">sempre na mesma cor de casa</b>. Assista!</p></div>
-  <div class="split"><div id="board14" class="rv" style="--i:1"></div>
-    <div class="panel rv" style="--i:2"><div class="msg gold" id="bishMsg" aria-live="polite">Observando o passeio…</div>
-      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px">
-        <button class="btn ghost small" id="bishReplay" type="button">▶ Rever</button>
-        <button class="btn ghost small" id="bishColor" type="button">🎨 Pintar casas da cor</button></div></div></div>
-</div></section>
-<section class="slide" data-title="O Cavalo"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">PEÇA POR PEÇA · 5/6</span><h2>O CAVALO ♞</h2><p class="sub">Anda em “L” (<b>2+1</b>) e <b style="color:var(--gold)">salta peças</b>! Ache TODAS as casas (f5 é sua; c6 dá captura).</p></div>
-  <div class="split"><div id="board15" class="rv" style="--i:1"></div>
-    <div class="panel rv" style="--i:2"><div class="msg gold" id="knightCount" aria-live="polite">Encontradas: 0 / 7</div>
-      <div class="msg" id="knightMsg" aria-live="polite"></div>
-      <button class="btn ghost small" id="knightReset" type="button">🔄 Reiniciar</button></div></div>
-</div></section>
-<section class="slide" data-title="O Peão"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">PEÇA POR PEÇA · 6/6</span><h2>O PEÃO ♟</h2><p class="sub"><b>Anda para frente</b>, <b>captura na diagonal</b> e, <b>na 1ª jogada, até 2 casas</b>. Nunca para trás!</p></div>
-  <div class="def-row rv" style="--i:1">
-    <div class="def-card"><div id="pb1" class="board tiny"></div><h4>ANDA 1 CASA ⬆️</h4><p>Uma por vez.</p><button class="btn ghost small" id="pb1r" type="button">▶</button></div>
-    <div class="def-card"><div id="pb2" class="board tiny"></div><h4>1ª JOGADA: 2</h4><p>Só da casa inicial.</p><button class="btn ghost small" id="pb2r" type="button">▶</button></div>
-    <div class="def-card"><div id="pb3" class="board tiny"></div><h4>CAPTURA NA DIAGONAL</h4><p>De frente empata 😈</p><button class="btn ghost small" id="pb3r" type="button">▶</button></div>
+</section>
+
+<!-- ============ 06 · DESAFIO CASA ============ -->
+<section class="screen" id="s6" aria-label="Desafio encontre a casa">
+  <div class="eyebrow">Seção 06 · Desafio</div>
+  <h2>Encontre a casa</h2>
+  <div class="grid2">
+    <div class="stack">
+      <div class="card" style="text-align:center">
+        <div class="small">Encontre a casa</div>
+        <div id="targetSq" style="font-family:var(--f-mono);font-size:3rem;color:var(--gold);font-weight:700">e4</div>
+        <div class="small">Primeiro a letra (coluna), depois o número (fileira).</div>
+      </div>
+      <div class="readout" id="findReadout">Clique na casa certa do tabuleiro.</div>
+      <div class="wrapc">
+        <button class="btn sm" id="btnNewSq">Nova casa</button>
+        <button class="btn ghost sm" id="btnHelpSq">Mostrar dica</button>
+      </div>
+      <p class="small">Acertos seguidos: <b id="findStreak">0</b></p>
+    </div>
+    <div class="board-wrap" id="wrap6" style="--bw:430px">
+      <div class="ranks" id="ranks6"></div>
+      <div class="board" id="board6" role="grid" aria-label="Tabuleiro do desafio"></div>
+      <div class="files" id="files6"></div>
+    </div>
   </div>
-</div></section>
-<section class="slide" data-title="Captura"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">COMBATE ⚔️</span><h2>CAPTURA</h2><p class="sub"><b style="color:var(--gold)">MOVIMENTO ≠ CAPTURA.</b> Capturar é ocupar a casa da peça adversária.</p></div>
-  <div class="split"><div id="board17" class="rv" style="--i:1"></div>
-    <div class="panel rv" style="--i:2"><div class="msg gold" id="capMsg" aria-live="polite">Preparando a cena…</div>
-      <div class="ctr" style="margin-top:10px"><button class="btn ghost small" id="capReplay" type="button">▶ Rever</button></div></div></div>
-</div></section>
-<section class="slide" data-title="Xeque"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">PERIGO! ⚠️</span><h2>XEQUE</h2><p class="sub">Peça atacando o rei = XEQUE! Existem <b>3 defesas</b>:</p></div>
-  <div id="board18" class="rv" style="--i:1"></div>
-  <div class="msg" id="checkMsg" aria-live="polite">&nbsp;</div>
-  <div class="ctr rv" style="--i:2"><button class="btn ghost small" id="checkReplay" type="button">▶ Rever xeque</button></div>
-  <div class="def-row rv" style="--i:3">
-    <div class="def-card"><div id="def1" class="board tiny"></div><h4>1. MOVER O REI</h4><p>Fugir para casa segura.</p></div>
-    <div class="def-card"><div id="def2" class="board tiny"></div><h4>2. CAPTURAR</h4><p>Eliminar a atacante.</p></div>
-    <div class="def-card"><div id="def3" class="board tiny"></div><h4>3. BLOQUEAR</h4><p>Peça no caminho.</p></div>
+</section>
+
+<!-- ============ 07 · ORIENTAÇÃO ============ -->
+<section class="screen" id="s7" aria-label="Como posicionar o tabuleiro">
+  <div class="eyebrow">Seção 07</div>
+  <h2>Como posicionar o tabuleiro?</h2>
+  <p class="lead">Antes de qualquer peça entrar em cena, o tabuleiro precisa estar virado do jeito certo. A regra cabe em quatro palavras: <b class="gold">casa branca à direita</b>. Olhe o canto de baixo à direita dos dois tabuleiros e escolha o correto.</p>
+  <div class="grid2 tight" id="orientPair" style="margin-top:18px"></div>
+  <div class="readout" id="orientReadout" style="margin-top:16px">Clique no tabuleiro posicionado corretamente.</div>
+</section>
+
+<!-- ============ 08 · PEÇAS ============ -->
+<section class="screen" id="s8" aria-label="Conhecendo as peças">
+  <div class="eyebrow">Seção 08</div>
+  <h2>Conhecendo as peças</h2>
+  <p class="lead">São seis tipos de peça, cada uma com um jeito próprio de andar. Escolha uma para conhecer.</p>
+  <div class="piecebar" id="pieceBar" style="margin:18px 0"></div>
+  <div class="card pdetail" id="pieceDetail"></div>
+</section>
+
+<!-- ============ 09 · POSIÇÃO INICIAL ============ -->
+<section class="screen" id="s9" aria-label="A posição inicial">
+  <div class="eyebrow">Seção 09</div>
+  <h2>A posição inicial</h2>
+  <div class="grid2">
+    <div class="stack">
+      <p class="lead">Toda partida começa igual: <b>16 peças brancas</b> embaixo e <b>16 peças pretas</b> em cima. As peças grandes ocupam a primeira fileira e os oito peões formam a linha da frente, como uma barreira.</p>
+      <div class="cards" style="grid-template-columns:1fr 1fr">
+        <div class="card center"><div class="num" style="font-family:var(--f-disp);font-size:2rem;color:var(--gold)">16</div><div class="small">peças brancas</div></div>
+        <div class="card center"><div class="num" style="font-family:var(--f-disp);font-size:2rem;color:var(--gold)">16</div><div class="small">peças pretas</div></div>
+      </div>
+      <div class="readout" id="initReadout">Clique em uma peça para ver o nome dela.</div>
+      <button class="btn sm" id="btnReplay9">Montar de novo</button>
+    </div>
+    <div class="board-wrap" id="wrap9" style="--bw:430px">
+      <div class="ranks" id="ranks9"></div>
+      <div class="board" id="board9" role="grid" aria-label="Tabuleiro na posição inicial"></div>
+      <div class="files" id="files9"></div>
+    </div>
   </div>
-</div></section>
-<section class="slide" data-title="Xeque-mate"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">O GRANDE FINAL 🏆</span><h2>XEQUE-MATE</h2><p class="sub"><b style="color:var(--gold)">XEQUE + NENHUMA FUGA = MATE.</b> O rei não pode capturar a dama (o rei branco a defende).</p></div>
-  <div id="board19" class="rv" style="--i:1"></div>
-  <div class="msg" id="mateMsg" aria-live="polite">&nbsp;</div>
-  <div class="ctr rv" style="--i:2"><button class="btn ghost small" id="mateReplay" type="button">▶ Rever mate</button></div>
-</div></section>
-<section class="slide" data-title="Empate"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">NEM SEMPRE HÁ VENCEDOR</span><h2>EMPATE 🤝</h2><p class="sub"><b>Rei afogado</b>: NÃO está em xeque, mas não tem jogada legal.</p></div>
-  <div class="split"><div id="board20" class="rv" style="--i:1"></div>
-    <div class="panel rv" style="--i:2"><p style="margin-bottom:10px">Outros empates:</p>
-      <p><span class="chip">🤝 Acordo</span> <span class="chip">🔁 Posição 3×</span> <span class="chip">🪶 Material insuficiente</span> <span class="chip">🕰️ 50 lances</span></p>
-      <p style="color:var(--muted);font-size:14px;margin-top:12px">Vencendo? Cuidado para não afogar o rei adversário! 😅</p></div></div>
-</div></section>
-<section class="slide" data-title="Valor das peças"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">MATEMÁTICA DO JOGO</span><h2>QUANTO VALE CADA PEÇA?</h2><p class="sub">O rei não tem preço! 👑</p></div>
-  <div class="val-cards">
-    <div class="val" style="--i:0;--w:11%"><span class="vp">♟</span><span class="vn">1</span><span class="vl">Peão</span><div class="bar"><i></i></div></div>
-    <div class="val" style="--i:1;--w:33%"><span class="vp">♞</span><span class="vn">3</span><span class="vl">Cavalo</span><div class="bar"><i></i></div></div>
-    <div class="val" style="--i:2;--w:33%"><span class="vp">♝</span><span class="vn">3</span><span class="vl">Bispo</span><div class="bar"><i></i></div></div>
-    <div class="val" style="--i:3;--w:55%"><span class="vp">♜</span><span class="vn">5</span><span class="vl">Torre</span><div class="bar"><i></i></div></div>
-    <div class="val" style="--i:4;--w:100%"><span class="vp">♛</span><span class="vn">9</span><span class="vl">Dama</span><div class="bar"><i></i></div></div>
-    <div class="val king" style="--i:5;--w:100%"><span class="vp">♚</span><span class="vn">∞</span><span class="vl">Rei</span><div class="bar"><i></i></div></div>
+</section>
+
+<!-- ============ 10 · REGRA DA DAMA ============ -->
+<section class="screen" id="s10" aria-label="A regra da dama">
+  <div class="eyebrow">Seção 10</div>
+  <h2>A dama fica na sua própria cor</h2>
+  <div class="grid2">
+    <div class="stack">
+      <p class="lead">Um jeito simples de nunca mais errar a montagem: a <b>dama branca começa em uma casa clara</b> (d1) e a <b>dama preta em uma casa escura</b> (d8). O rei fica ao lado dela, na coluna <b>e</b>.</p>
+      <div class="card">
+        <p style="margin:0">Se você montou o tabuleiro e a dama branca ficou em casa escura, provavelmente trocou o rei de lugar com a dama. É o erro mais comum de quem está começando.</p>
+      </div>
+      <button class="btn sm" id="btnReplay10">Ver a animação de novo</button>
+    </div>
+    <div class="board-wrap" id="wrap10" style="--bw:430px">
+      <div class="ranks" id="ranks10"></div>
+      <div class="board" id="board10" role="grid" aria-label="Damas e reis na posição inicial"></div>
+      <div class="files" id="files10"></div>
+    </div>
   </div>
-  <div class="msg gold rv" style="--i:7">💡 Trocar torre (5) por dama (9)? Só de graça! 😄</div>
-</div></section>
-<section class="slide" data-title="O poder do centro"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">ESTRATÉGIA 🧭</span><h2>O PODER DO CENTRO</h2><p class="sub"><b style="color:var(--gold)">d4, e4, d5, e5</b> = coração do tabuleiro.</p></div>
-  <div class="split"><div id="board22" class="rv" style="--i:1"></div>
-    <div class="panel rv" style="--i:2"><p class="ctr" style="margin-bottom:10px">Cavalo no centro: <b style="color:var(--gold)">8 casas</b>; no canto: <b style="color:var(--bad)">2</b>!</p>
-      <div style="display:flex;gap:14px;justify-content:center">
-        <div class="ctr"><div id="miniC1" class="board tiny"></div><span class="chip" style="margin-top:6px">e4 → <b>8</b></span></div>
-        <div class="ctr"><div id="miniC2" class="board tiny"></div><span class="chip" style="margin-top:6px">a1 → <b>2</b></span></div></div></div></div>
-</div></section>
-<section class="slide" data-title="Pense antes de jogar"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">HÁBITO DE MESTRE 🧠</span><h2>PENSE ANTES DE JOGAR</h2><p class="sub">O peão de d3 parece grátis… e depois?</p></div>
-  <div class="split"><div id="board23" class="rv" style="--i:1"></div>
-    <div class="think-steps rv" style="--i:2">
-      <div class="think-step" id="ts1"><span class="n">1</span><div><b>O que o adversário ameaça?</b><br><small style="color:var(--muted)">O bispo g6 observa d3…</small></div></div>
-      <div class="think-link"></div>
-      <div class="think-step" id="ts2"><span class="n">2</span><div><b>O que eu posso fazer?</b><br><small style="color:var(--muted)">Dama pode capturar d3!</small></div></div>
-      <div class="think-link"></div>
-      <div class="think-step" id="ts3"><span class="n">3</span><div><b>E depois da minha jogada?</b><br><small style="color:var(--muted)">Qxd3… Bxd3! Perdi a dama! 😱</small></div></div>
-      <div class="ctr" style="margin-top:12px"><button class="btn ghost small" id="thinkReplay" type="button">▶ Rever</button></div>
-    </div></div>
-</div></section>
-<section class="slide" data-title="Desafio final (quiz)"><div class="wrap">
-  <div class="s-head rv"><span class="kicker">HORA DO SHOW 🎮</span><h2>DESAFIO FINAL</h2><p class="sub">10 pontos por acerto de primeira; 5 na segunda tentativa.</p></div>
-  <div class="panel rv" style="--i:1" id="quizBox" aria-live="polite"></div>
-</div></section>
-<section class="slide" data-title="Missão final"><div class="final">
-  <h2 class="rv">AGORA É SUA VEZ! ♟️</h2>
-  <p class="quote rv" style="--i:1">“No xadrez, não basta saber onde sua peça pode ir. É preciso pensar no que acontecerá <b>depois</b> da sua jogada.”</p>
-  <div class="rv" style="--i:2;display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
-    <a class="btn" href="https://lichess.org/learn#/pt-br" target="_blank" rel="noopener">🎮 JOGAR XADREZ</a>
-    <button class="btn ghost" id="restartBtn" type="button">🔁 Rever apresentação</button></div>
-  <p class="rv" style="--i:3;color:#8d8172;font-size:13px">Cumprimente o adversário antes e depois. Respeito também é estratégia! 🤝</p>
-</div></section>
+</section>
+
+<!-- ============ 11..16 · MOVIMENTOS (gerados por JS) ============ -->
+<section class="screen" id="s11" aria-label="O rei"></section>
+<section class="screen" id="s12" aria-label="A dama"></section>
+<section class="screen" id="s13" aria-label="A torre"></section>
+<section class="screen" id="s14" aria-label="O bispo"></section>
+<section class="screen" id="s15" aria-label="O cavalo"></section>
+<section class="screen" id="s16" aria-label="O peão"></section>
+
+<!-- ============ 17 · CAPTURA ============ -->
+<section class="screen" id="s17" aria-label="Captura">
+  <div class="eyebrow">Seção 17</div>
+  <h2>Captura</h2>
+  <div class="grid2">
+    <div class="stack">
+      <p class="lead">Capturar é ocupar a casa onde está uma peça adversária. A peça capturada sai do tabuleiro e não volta mais. No xadrez não existe salto por cima como nas damas: quem captura <b>toma o lugar</b> de quem foi capturado.</p>
+      <div class="card">
+        <div style="font-family:var(--f-disp);font-weight:800;font-size:1.15rem;color:var(--gold);margin-bottom:6px">MOVIMENTO ≠ CAPTURA</div>
+        <p style="margin:0" class="small">Mover é ir para uma casa vazia. Capturar é ir para uma casa ocupada pelo adversário. Uma peça nunca captura outra da própria cor, nem ocupa a casa de uma companheira.</p>
+      </div>
+      <div class="readout" id="capReadout">Aperte o botão para ver a cena.</div>
+      <div class="wrapc">
+        <button class="btn sm" id="btnCapMove">Ver um movimento</button>
+        <button class="btn sm" id="btnCapTake">Ver uma captura</button>
+      </div>
+    </div>
+    <div class="board-wrap" id="wrap17" style="--bw:400px">
+      <div class="ranks" id="ranks17"></div>
+      <div class="board" id="board17" role="grid" aria-label="Demonstração de captura"></div>
+      <div class="files" id="files17"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 18 · XEQUE ============ -->
+<section class="screen" id="s18" aria-label="Xeque">
+  <div class="eyebrow">Seção 18</div>
+  <h2>Xeque <span aria-hidden="true">⚠️</span></h2>
+  <div class="grid2">
+    <div class="stack">
+      <p class="lead">Xeque é o aviso de que o rei está sendo atacado. Não é o fim da partida: é uma emergência que precisa ser resolvida imediatamente, e o jogador é obrigado a escolher uma das três saídas abaixo.</p>
+      <div class="steps" id="checkSteps"></div>
+      <div class="readout" id="checkReadout">A torre branca ataca o rei preto pela coluna e.</div>
+      <button class="btn ghost sm" id="btnCheckReset">Voltar à posição de xeque</button>
+    </div>
+    <div class="board-wrap" id="wrap18" style="--bw:400px">
+      <div class="ranks" id="ranks18"></div>
+      <div class="board" id="board18" role="grid" aria-label="Posição de xeque"></div>
+      <div class="files" id="files18"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 19 · XEQUE-MATE ============ -->
+<section class="screen" id="s19" aria-label="Xeque-mate">
+  <div class="eyebrow">Seção 19</div>
+  <h2>Xeque-mate <span aria-hidden="true">🏆</span></h2>
+  <div class="grid2">
+    <div class="stack">
+      <p class="lead">Xeque-mate é o xeque sem solução. O rei está atacado, não tem casa para onde fugir, ninguém consegue capturar quem ataca e ninguém consegue entrar na frente para bloquear. A partida termina na hora.</p>
+      <div class="card center" style="font-family:var(--f-disp);font-weight:800;font-size:clamp(1rem,2.6vw,1.35rem)">
+        XEQUE <span class="gold">+</span> NENHUMA FUGA <span class="gold">=</span> XEQUE-MATE
+      </div>
+      <div class="readout" id="mateReadout">Aperte o botão e acompanhe a jogada final.</div>
+      <button class="btn sm" id="btnMate">Ver o xeque-mate</button>
+      <p class="small">Neste exemplo o rei preto está preso atrás dos próprios peões. Eles protegem, mas também tiram o espaço de fuga.</p>
+    </div>
+    <div class="board-wrap" id="wrap19" style="--bw:400px">
+      <div class="ranks" id="ranks19"></div>
+      <div class="board" id="board19" role="grid" aria-label="Posição de xeque-mate"></div>
+      <div class="files" id="files19"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 20 · EMPATE ============ -->
+<section class="screen" id="s20" aria-label="Empate">
+  <div class="eyebrow">Seção 20</div>
+  <h2>Empate</h2>
+  <div class="grid2">
+    <div class="stack">
+      <p class="lead">Nem toda partida tem vencedor. Quando ninguém consegue dar o xeque-mate, o resultado é empate, e cada jogador leva meio ponto. Existem várias formas de isso acontecer; a mais surpreendente para quem começa é o <b>afogamento</b>.</p>
+      <div class="steps" id="drawSteps"></div>
+      <div class="readout" id="drawReadout">É a vez das pretas. O rei preto não está em xeque, mas qualquer casa para onde ele fosse estaria atacada. Isso é afogamento: empate.</div>
+      <button class="btn sm" id="btnDraw">Mostrar as casas atacadas</button>
+    </div>
+    <div class="board-wrap" id="wrap20" style="--bw:400px">
+      <div class="ranks" id="ranks20"></div>
+      <div class="board" id="board20" role="grid" aria-label="Posição de empate por afogamento"></div>
+      <div class="files" id="files20"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 21 · VALORES ============ -->
+<section class="screen" id="s21" aria-label="Quanto vale cada peça">
+  <div class="eyebrow">Seção 21</div>
+  <h2>Quanto vale cada peça?</h2>
+  <p class="lead">Estes números não aparecem em lugar nenhum do tabuleiro: eles servem para o jogador comparar trocas. Trocar um bispo (3) por uma torre (5) costuma ser um bom negócio; trocar uma dama (9) por um cavalo (3), quase nunca.</p>
+  <div class="card" id="valList" style="margin-top:18px;display:grid;gap:14px"></div>
+  <div class="card" style="margin-top:16px">
+    <p style="margin:0" class="small">O rei não recebe número porque não pode ser trocado por nada: perder o rei é perder a partida. E lembre-se de que a posição às vezes vale mais que o material. Um peão perto de virar dama pode ser mais perigoso que uma torre parada em um canto.</p>
+  </div>
+</section>
+
+<!-- ============ 22 · CENTRO ============ -->
+<section class="screen" id="s22" aria-label="O poder do centro">
+  <div class="eyebrow">Seção 22</div>
+  <h2>O poder do centro</h2>
+  <div class="grid2">
+    <div class="stack">
+      <p class="lead">As quatro casas centrais, <b class="gold">d4, e4, d5 e e5</b>, são o ponto mais disputado do tabuleiro. Uma peça no centro enxerga mais casas e chega mais rápido aos dois lados; a mesma peça em um canto fica quase sem trabalho.</p>
+      <div class="chips" id="centerChips"></div>
+      <div class="readout" id="centerReadout">Compare o cavalo no centro com o cavalo no canto.</div>
+      <p class="small">Por isso as primeiras jogadas de quase toda partida disputam o centro em vez de sair passeando pelas laterais.</p>
+    </div>
+    <div class="board-wrap" id="wrap22" style="--bw:420px">
+      <div class="ranks" id="ranks22"></div>
+      <div class="board" id="board22" role="grid" aria-label="Tabuleiro destacando o centro"></div>
+      <div class="files" id="files22"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 23 · PENSE ANTES DE JOGAR ============ -->
+<section class="screen" id="s23" aria-label="Pense antes de jogar">
+  <div class="eyebrow">Seção 23</div>
+  <h2>Pense antes de jogar</h2>
+  <div class="grid2">
+    <div class="stack">
+      <p class="lead">Antes de encostar em qualquer peça, faça três perguntas na mesma ordem. Elas evitam a maior parte dos erros de quem está aprendendo.</p>
+      <div class="steps" id="thinkSteps"></div>
+      <div class="readout" id="thinkReadout">Aperte o botão para ver uma jogada apressada e o que acontece depois dela.</div>
+      <div class="wrapc">
+        <button class="btn sm" id="btnThink">Ver a jogada apressada</button>
+        <button class="btn ghost sm" id="btnThinkReset">Reiniciar a cena</button>
+      </div>
+    </div>
+    <div class="board-wrap" id="wrap23" style="--bw:400px">
+      <div class="ranks" id="ranks23"></div>
+      <div class="board" id="board23" role="grid" aria-label="Cena de decisão"></div>
+      <div class="files" id="files23"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 24 · QUIZ ============ -->
+<section class="screen" id="s24" aria-label="Desafio final">
+  <div class="eyebrow">Seção 24 · Desafio final</div>
+  <h2>Desafio final</h2>
+  <div class="scorebox" style="margin-bottom:14px">
+    <span class="pill gold" id="qScore">Pontos: 0</span>
+    <div class="qprog" aria-hidden="true"><i id="qProgBar"></i></div>
+    <span class="small" id="qCount">Pergunta 1 de 8</span>
+  </div>
+  <div class="card" id="quizCard"></div>
+  <div class="wrapc" style="margin-top:14px">
+    <button class="btn ghost sm" id="btnQuizRestart">Recomeçar o quiz</button>
+  </div>
+</section>
+
+<!-- ============ 25 · MISSÃO FINAL ============ -->
+<section class="screen" id="s25" aria-label="Missão final">
+  <div class="cover">
+    <div>
+      <div class="eyebrow">Seção 25 · Missão final</div>
+      <h1>Agora é<br>sua vez! <span class="gold">♟</span></h1>
+      <p class="lead" style="font-size:1.1rem">"No xadrez, não basta saber onde sua peça pode ir. É preciso pensar no que acontecerá depois da sua jogada."</p>
+      <div class="card" id="finalScore" style="margin:16px 0"></div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <a class="btn" href="https://lichess.org/pt" target="_blank" rel="noopener noreferrer">JOGAR XADREZ ↗</a>
+        <button class="btn ghost" id="btnRestartAll">Rever a aula do início</button>
+      </div>
+      <p class="small" style="margin-top:10px">Ainda faltam três regras especiais para conhecer depois desta aula: o <b>roque</b>, a <b>promoção</b> do peão e a captura <b>en passant</b>. Elas aparecem menos no começo, mas fazem parte do jogo.</p>
+      <p class="small" style="margin-top:8px">O botão abre o Lichess, um site gratuito e sem cadastro obrigatório para jogar no navegador. Se a escola não tiver internet liberada, o tabuleiro de madeira funciona igualmente bem.</p>
+    </div>
+    <div class="art">
+      <div class="board-wrap nocoord" style="--bw:400px">
+        <div class="board" id="boardFinal" aria-hidden="true"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 </main>
-<nav class="bottom">
-  <button class="nbtn" id="prevBtn" type="button">← Anterior</button>
-  <div id="counter">1 / 25</div>
-  <button class="nbtn primary" id="nextBtn" type="button">Próximo →</button>
+
+<!-- ============================================================
+     NAVEGAÇÃO INFERIOR
+     ============================================================ -->
+<nav class="navbar" aria-label="Navegação entre seções">
+  <button class="nav-btn" id="btnPrev" aria-label="Seção anterior">←</button>
+  <span class="nav-title" id="navTitle">Capa</span>
+  <button class="nav-btn" id="btnNext" aria-label="Próxima seção">→</button>
 </nav>
-<div id="menu" hidden role="dialog" aria-modal="true"><h3>☰ SEÇÕES DA AULA</h3><div class="menu-grid" id="menuGrid"></div></div>
-<div id="toast" hidden role="status"></div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="sr" id="live" role="status" aria-live="polite"></div>
 <script>
+(function(){
 'use strict';
-const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const FILES='abcdefgh';
-const animOff=()=>document.documentElement.classList.contains('anim-off');
-const wait=ms=>new Promise(r=>setTimeout(r,animOff()?0:ms));
-const parseSq=s=>({f:FILES.indexOf(s[0]),r:+s[1]-1});
-const sqName=(f,r)=>FILES[f]+(r+1);
-const inB=(f,r)=>f>=0&&f<8&&r>=0&&r<8;
-const GLYPH={k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'};
-const NAMES={k:'Rei',q:'Dama',r:'Torre',b:'Bispo',n:'Cavalo',p:'Peão'};
-let AC=null,soundOn=true;
-function tone(f,d=0.08,type='sine',g=0.05,when=0){if(!soundOn)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const t=AC.currentTime+when,o=AC.createOscillator(),gn=AC.createGain();o.type=type;o.frequency.value=f;gn.gain.setValueAtTime(g,t);gn.gain.exponentialRampToValueAtTime(0.0001,t+d);o.connect(gn).connect(AC.destination);o.start(t);o.stop(t+d+0.03);}catch(e){}}
-const sfx={nav:()=>tone(520,.06,'triangle',.04),ok:()=>{tone(660,.09);tone(880,.14,'sine',.05,.1);},bad:()=>tone(150,.18,'sawtooth',.04),move:()=>tone(300,.05,'square',.035),cap:()=>{tone(240,.07,'square',.045);tone(170,.1,'square',.045,.08);}};
-function buildBoard(el,o={}){
-  const{coords=false,flipped=false,clickable=false,stagger=false,staggerMs=22}=o;
-  if(clickable)el.classList.add('clickable');
-  const expr=el.classList.contains('tiny')?'min(60vw,24vh,170px)':el.classList.contains('mini')?'min(80vw,34vh,260px)':'min(92vw,52vh,540px)';
-  el.style.width=expr;el.style.height=expr;el.style.position='relative';el.style.flex='none';el.style.margin='0 auto';
-  el._pfs='calc('+expr+' / 8 * 0.72)';
-  const lfs='calc('+expr+' / 8 * 0.30)';
-  const grid=document.createElement('div');
-  grid.style.cssText='position:absolute;top:0;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);border-radius:10px;overflow:hidden';
-  el._map={};let i=0;
-  for(let rank=8;rank>=1;rank--)for(let f=0;f<8;f++){
-    const coord=FILES[f]+rank;
-    const light=((f+rank)%2===0)!==flipped;
-    const d=document.createElement('div');
-    d.className='sq '+(light?'light':'dark');d.dataset.coord=coord;
-    if(stagger){d.classList.add('pop');d.style.setProperty('--d',(i*staggerMs)+'ms');}
-    if(coords){
-      if(rank===1){const c=document.createElement('span');c.className='cl file';c.textContent=FILES[f];c.style.fontSize=lfs;d.appendChild(c);}
-      if(f===0){const c=document.createElement('span');c.className='cl rank';c.textContent=rank;c.style.fontSize=lfs;d.appendChild(c);}
+
+/* ============================================================
+   0. UTILITÁRIOS
+   ============================================================ */
+var FILES='abcdefgh';
+var SVGNS='http://www.w3.org/2000/svg';
+function $(s,r){return (r||document).querySelector(s);}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
+function el(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
+var mqReduce=window.matchMedia('(prefers-reduced-motion: reduce)');
+function reduced(){return mqReduce.matches;}
+function nm(f,r){return FILES[f]+(r+1);}
+function idx(sq){return [FILES.indexOf(sq[0]),parseInt(sq[1],10)-1];}
+function inb(f,r){return f>=0&&f<8&&r>=0&&r<8;}
+function isLight(f,r){return (f+r)%2===1;}
+
+var NAMES={K:'Rei',Q:'Dama',R:'Torre',B:'Bispo',N:'Cavalo',P:'Peão'};
+var COLORS={w:'branco',b:'preto'};
+var COLORSF={w:'branca',b:'preta'};
+
+/* som opcional (Web Audio, sem arquivos externos) */
+var soundOn=true, actx=null;
+function beep(freq,dur,type,vol){
+  if(!soundOn)return;
+  try{
+    if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)();
+    if(actx.state==='suspended')actx.resume();
+    var o=actx.createOscillator(),g=actx.createGain();
+    o.type=type||'sine';o.frequency.value=freq;
+    g.gain.setValueAtTime(0.0001,actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(vol||0.06,actx.currentTime+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,actx.currentTime+(dur||0.12));
+    o.connect(g);g.connect(actx.destination);
+    o.start();o.stop(actx.currentTime+(dur||0.12)+0.02);
+  }catch(e){}
+}
+var SFX={
+  click:function(){beep(520,.07,'triangle',.05);},
+  move:function(){beep(320,.09,'sine',.06);},
+  cap:function(){beep(180,.16,'square',.05);},
+  ok:function(){beep(660,.09,'triangle',.06);setTimeout(function(){beep(880,.13,'triangle',.06);},90);},
+  no:function(){beep(160,.18,'sawtooth',.04);},
+  win:function(){[523,659,784,1046].forEach(function(f,i){setTimeout(function(){beep(f,.16,'triangle',.06);},i*110);});}
+};
+
+var toastEl=$('#toast'),toastT=null;
+function toast(msg){
+  toastEl.textContent=msg;toastEl.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show');},2200);
+}
+function say(msg){var l=$('#live');if(l)l.textContent=msg;}
+function setReadout(node,txt,state){
+  if(!node)return;
+  node.textContent=txt;
+  node.classList.remove('ok','no');
+  if(state)node.classList.add(state);
+  /* em telas estreitas o retorno também aparece perto do polegar */
+  if(state&&window.innerWidth<=900)toast(txt);
+}
+
+/* ============================================================
+   1. TABULEIRO
+   ============================================================ */
+function Board(node,opts){
+  opts=opts||{};
+  this.el=node;this.cells={};this.pieces={};
+  this.flip=!!opts.flip;          /* visão das pretas: inverte fileiras e colunas */
+  this.mirror=!!opts.mirror;      /* espelha só as colunas: orientação errada */
+  this.build();
+}
+Board.prototype.build=function(){
+  var self=this;this.el.innerHTML='';this.cells={};this.pieces={};
+  var rs=this.flip?[0,1,2,3,4,5,6,7]:[7,6,5,4,3,2,1,0];
+  var fs=(this.flip||this.mirror)?[7,6,5,4,3,2,1,0]:[0,1,2,3,4,5,6,7];
+  rs.forEach(function(r){
+    fs.forEach(function(f){
+      var name=nm(f,r);
+      var c=el('div','sq '+(isLight(f,r)?'l':'d'));
+      c.dataset.sq=name;c.dataset.f=f;c.dataset.r=r;
+      c.setAttribute('aria-label','casa '+name+', '+(isLight(f,r)?'clara':'escura'));
+      c.appendChild(el('span','coord',name));
+      self.el.appendChild(c);
+      self.cells[name]=c;
+    });
+  });
+};
+Board.prototype.coordsBar=function(rankNode,fileNode){
+  var rs=this.flip?[1,2,3,4,5,6,7,8]:[8,7,6,5,4,3,2,1];
+  var fs=(this.flip||this.mirror)?['h','g','f','e','d','c','b','a']:['a','b','c','d','e','f','g','h'];
+  if(rankNode)rankNode.innerHTML=rs.map(function(n){return '<span>'+n+'</span>';}).join('');
+  if(fileNode)fileNode.innerHTML=fs.map(function(n){return '<span>'+n+'</span>';}).join('');
+};
+Board.prototype.clear=function(){
+  for(var k in this.pieces){if(this.pieces[k].el.parentNode)this.pieces[k].el.remove();}
+  this.pieces={};this.clearMarks();
+};
+Board.prototype.clearMarks=function(){
+  var self=this;
+  Object.keys(this.cells).forEach(function(k){
+    var c=self.cells[k];
+    c.classList.remove('hl','hl-soft','good','bad','center-hl','file-hl','rank-hl');
+    $$('.dot',c).forEach(function(d){d.remove();});
+  });
+};
+Board.prototype.mark=function(sq,cls){var c=this.cells[sq];if(c)c.classList.add(cls);};
+Board.prototype.unmark=function(sq,cls){var c=this.cells[sq];if(c)c.classList.remove(cls);};
+Board.prototype.dot=function(sq,cap){
+  var c=this.cells[sq];if(!c)return;
+  if($('.dot',c))return;
+  c.appendChild(el('div','dot'+(cap?' cap':'')));
+};
+Board.prototype.put=function(sq,code,anim,delay){
+  var c=this.cells[sq];if(!c)return null;
+  this.remove(sq);
+  var svg=document.createElementNS(SVGNS,'svg');
+  svg.setAttribute('viewBox','0 0 45 45');
+  svg.setAttribute('class','pc '+(code.charAt(0)==='w'?'w':'b'));
+  svg.setAttribute('role','img');
+  svg.setAttribute('aria-label',NAMES[code.charAt(1)]+' '+COLORSF[code.charAt(0)]+' em '+sq);
+  var use=document.createElementNS(SVGNS,'use');
+  use.setAttribute('href','#pc-'+code.charAt(1).toLowerCase());
+  use.setAttributeNS('http://www.w3.org/1999/xlink','xlink:href','#pc-'+code.charAt(1).toLowerCase());
+  svg.appendChild(use);
+  c.appendChild(svg);
+  if(anim&&!reduced()){
+    svg.style.animationDelay=(delay||0)+'ms';
+    svg.classList.add('drop');
+  }
+  this.pieces[sq]={code:code,el:svg};
+  return svg;
+};
+Board.prototype.remove=function(sq){
+  var p=this.pieces[sq];
+  if(p){if(p.el.parentNode)p.el.remove();delete this.pieces[sq];}
+};
+Board.prototype.position=function(map,anim){
+  this.clear();
+  var i=0,self=this;
+  Object.keys(map).forEach(function(sq){self.put(sq,map[sq],anim,i++*55);});
+};
+Board.prototype.map=function(){
+  var m={},self=this;
+  Object.keys(this.pieces).forEach(function(k){m[k]=self.pieces[k].code;});
+  return m;
+};
+/* movimento animado (técnica FLIP) */
+Board.prototype.move=function(from,to,done){
+  var p=this.pieces[from];
+  if(!p){if(done)done();return;}
+  var target=this.pieces[to];
+  var a=p.el.getBoundingClientRect();
+  if(target){
+    target.el.classList.add('fade');
+    var old=target.el;
+    setTimeout(function(){if(old.parentNode)old.remove();},reduced()?0:340);
+    delete this.pieces[to];
+  }
+  this.cells[to].appendChild(p.el);
+  delete this.pieces[from];
+  this.pieces[to]=p;
+  p.el.setAttribute('aria-label',NAMES[p.code.charAt(1)]+' '+COLORSF[p.code.charAt(0)]+' em '+to);
+  var b=p.el.getBoundingClientRect();
+  var dx=a.left-b.left,dy=a.top-b.top;
+  if(reduced()||a.width===0||(dx===0&&dy===0)){if(done)done();return;}
+  p.el.style.transition='none';
+  p.el.style.transform='translate('+dx+'px,'+dy+'px)';
+  p.el.getBoundingClientRect();
+  p.el.style.transition='transform .45s cubic-bezier(.2,.8,.3,1)';
+  p.el.style.transform='';
+  setTimeout(function(){p.el.style.transition='';p.el.style.transform='';if(done)done();},480);
+};
+Board.prototype.cellOf=function(node){
+  while(node&&node!==this.el){
+    if(node.classList&&node.classList.contains('sq'))return node;
+    node=node.parentNode;
+  }
+  return null;
+};
+/* torna o tabuleiro operável por clique, toque e teclado */
+Board.prototype.onSquare=function(fn){
+  var self=this;
+  this.el.setAttribute('role','group');
+  if(!this._kb){
+    this._kb=true;
+    Object.keys(this.cells).forEach(function(k,i){
+      var c=self.cells[k];
+      c.setAttribute('role','button');
+      c.tabIndex=(i===0?0:-1);
+      c.classList.add('pick');
+    });
+    this.el.addEventListener('keydown',function(ev){
+      var c=self.cellOf(ev.target);
+      if(!c)return;
+      var f=+c.dataset.f,r=+c.dataset.r,nf=f,nr=r;
+      if(ev.key==='ArrowRight')nf=f+1;
+      else if(ev.key==='ArrowLeft')nf=f-1;
+      else if(ev.key==='ArrowUp')nr=r+1;
+      else if(ev.key==='ArrowDown')nr=r-1;
+      else if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();ev.stopPropagation();c.click();return;}
+      else return;
+      ev.preventDefault();ev.stopPropagation();
+      if(!inb(nf,nr))return;
+      var t=self.cells[nm(nf,nr)];
+      c.tabIndex=-1;t.tabIndex=0;t.focus();
+    });
+  }
+  if(this._handler)this.el.removeEventListener('click',this._handler);
+  this._handler=function(ev){
+    var c=self.cellOf(ev.target);
+    if(!c)return;
+    fn(c.dataset.sq,c,ev);
+  };
+  this.el.addEventListener('click',this._handler);
+};
+
+/* ============================================================
+   2. REGRAS DE MOVIMENTO
+   ============================================================ */
+var DIRS={
+  R:[[1,0],[-1,0],[0,1],[0,-1]],
+  B:[[1,1],[1,-1],[-1,1],[-1,-1]]
+};
+DIRS.Q=DIRS.R.concat(DIRS.B);
+var NJUMP=[[1,2],[2,1],[2,-1],[1,-2],[-1,-2],[-2,-1],[-2,1],[-1,2]];
+
+function legalMoves(pos,sq){
+  var code=pos[sq];
+  var out={moves:[],caps:[],all:[]};
+  if(!code)return out;
+  var color=code.charAt(0),type=code.charAt(1);
+  var p=idx(sq),f=p[0],r=p[1];
+  function add(ff,rr){
+    if(!inb(ff,rr))return 'stop';
+    var t=pos[nm(ff,rr)];
+    if(!t){out.moves.push(nm(ff,rr));return 'go';}
+    if(t.charAt(0)!==color)out.caps.push(nm(ff,rr));
+    return 'stop';
+  }
+  if(type==='K'){DIRS.Q.forEach(function(d){add(f+d[0],r+d[1]);});}
+  else if(type==='N'){NJUMP.forEach(function(d){add(f+d[0],r+d[1]);});}
+  else if(type==='P'){
+    var dir=color==='w'?1:-1,start=color==='w'?1:6;
+    if(inb(f,r+dir)&&!pos[nm(f,r+dir)]){
+      out.moves.push(nm(f,r+dir));
+      if(r===start&&!pos[nm(f,r+2*dir)])out.moves.push(nm(f,r+2*dir));
     }
-    grid.appendChild(d);el._map[coord]=d;i++;
+    [-1,1].forEach(function(df){
+      var ff=f+df,rr=r+dir;
+      if(!inb(ff,rr))return;
+      var t=pos[nm(ff,rr)];
+      if(t&&t.charAt(0)!==color)out.caps.push(nm(ff,rr));
+    });
+  }else{
+    DIRS[type].forEach(function(d){
+      var ff=f+d[0],rr=r+d[1];
+      while(inb(ff,rr)){
+        if(add(ff,rr)==='stop')break;
+        ff+=d[0];rr+=d[1];
+      }
+    });
   }
-  el.appendChild(grid);return el;
+  out.all=out.moves.concat(out.caps);
+  return out;
 }
-function pieceSpan(t,c,delay,fs){const s=document.createElement('span');s.className='piece '+c;s.textContent=GLYPH[t];s.dataset.t=t;s.dataset.c=c;if(fs)s.style.fontSize=fs;if(delay!=null){s.classList.add('drop');s.style.setProperty('--d',delay+'ms');}return s;}
-function setP(el,coord,t,c,delay){const sq=el._map[coord];sq.querySelectorAll('.piece').forEach(p=>p.remove());sq.appendChild(pieceSpan(t,c,delay,el._pfs));}
-function clearP(el,coord){el._map[coord].querySelectorAll('.piece').forEach(p=>p.remove());}
-function posObj(l){const o={};l.forEach(([c,t,cc])=>o[c]={t,c:cc});return o;}
-function renderPos(el,pos){Object.keys(el._map).forEach(c=>clearP(el,c));for(const c in pos)setP(el,c,pos[c].t,pos[c].c);}
-let arrowUid=0;
-function overlay(el){let s=el.querySelector('svg.arrows');if(!s){s=document.createElementNS('http://www.w3.org/2000/svg','svg');s.setAttribute('class','arrows');s.setAttribute('viewBox','0 0 100 100');s.setAttribute('preserveAspectRatio','none');el.appendChild(s);}return s;}
-function arrow(el,from,to,color='#e8b64c',w=2.2,dash=false){
-  const s=overlay(el),a=parseSq(from),b=parseSq(to),id='ah'+(++arrowUid);
-  const mk=document.createElementNS('http://www.w3.org/2000/svg','marker');
-  mk.setAttribute('id',id);mk.setAttribute('viewBox','0 0 10 10');mk.setAttribute('refX','7');mk.setAttribute('refY','5');mk.setAttribute('markerWidth','3.4');mk.setAttribute('markerHeight','3.4');mk.setAttribute('orient','auto-start-reverse');
-  const pt=document.createElementNS('http://www.w3.org/2000/svg','path');pt.setAttribute('d','M0,0 L10,5 L0,10 z');pt.setAttribute('fill',color);mk.appendChild(pt);s.appendChild(mk);
-  const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
-  ln.setAttribute('x1',a.f*12.5+6.25);ln.setAttribute('y1',(7-a.r)*12.5+6.25);ln.setAttribute('x2',b.f*12.5+6.25);ln.setAttribute('y2',(7-b.r)*12.5+6.25);
-  ln.setAttribute('stroke',color);ln.setAttribute('stroke-width',w);ln.setAttribute('stroke-linecap','round');ln.setAttribute('marker-end','url(#'+id+')');
-  if(dash)ln.setAttribute('stroke-dasharray','4 3');
-  s.appendChild(ln);
-  if(!animOff()&&!dash&&ln.animate){try{ln.setAttribute('pathLength','100');ln.style.strokeDasharray='100';ln.style.strokeDashoffset='100';const an=ln.animate([{strokeDashoffset:'100'},{strokeDashoffset:'0'}],{duration:420,easing:'ease-out',fill:'forwards'});an.onfinish=()=>{ln.style.strokeDasharray='';ln.style.strokeDashoffset='';};}catch(e){}}
-  return ln;
+/* casas atacadas por uma cor (para xeque e afogamento) */
+function attacked(pos,color){
+  var set={};
+  Object.keys(pos).forEach(function(sq){
+    var code=pos[sq];
+    if(code.charAt(0)!==color)return;
+    if(code.charAt(1)==='P'){
+      var p=idx(sq),dir=color==='w'?1:-1;
+      [-1,1].forEach(function(df){
+        if(inb(p[0]+df,p[1]+dir))set[nm(p[0]+df,p[1]+dir)]=true;
+      });
+      return;
+    }
+    var m=legalMoves(pos,sq);
+    m.all.forEach(function(s){set[s]=true;});
+    /* casas defendidas (ocupadas por peça própria) também contam como atacadas */
+    var pp=idx(sq),type=code.charAt(1);
+    if(type==='N'){
+      NJUMP.forEach(function(d){if(inb(pp[0]+d[0],pp[1]+d[1]))set[nm(pp[0]+d[0],pp[1]+d[1])]=true;});
+    }else if(type==='K'){
+      DIRS.Q.forEach(function(d){if(inb(pp[0]+d[0],pp[1]+d[1]))set[nm(pp[0]+d[0],pp[1]+d[1])]=true;});
+    }else if(DIRS[type]){
+      DIRS[type].forEach(function(d){
+        var ff=pp[0]+d[0],rr=pp[1]+d[1];
+        while(inb(ff,rr)){set[nm(ff,rr)]=true;if(pos[nm(ff,rr)])break;ff+=d[0];rr+=d[1];}
+      });
+    }
+  });
+  return set;
 }
-function clearArrows(el){const s=el.querySelector('svg.arrows');if(s)s.remove();}
-function mark(el,coord,cls){el._map[coord].classList.add(cls);}
-function unmarkAll(el,cls){el.querySelectorAll('.sq.'+cls).forEach(s=>s.classList.remove(cls));}
-function clearMarks(el){Object.values(el._map).forEach(s=>s.classList.remove('hl','hl-cap','sel','no','opt','trail','cand','okmark','glow','danger','shake'));}
-function animateMove(el,from,to){
-  const fromSq=el._map[from],toSq=el._map[to];const p=fromSq.querySelector('.piece');if(!p)return;
-  const r1=fromSq.getBoundingClientRect(),r2=toSq.getBoundingClientRect();
-  const cap=toSq.querySelector('.piece');
-  if(cap){cap.classList.add('cap-out');setTimeout(()=>cap.remove(),animOff()?0:340);}
-  p.classList.remove('drop');p.style.animation='none';
-  toSq.appendChild(p);
-  if(animOff())return;
-  const dx=r1.left-r2.left,dy=r1.top-r2.top;
-  if(p.animate){try{p.animate([{transform:'translate('+dx+'px,'+dy+'px)'},{transform:'translate(0,0)'}],{duration:480,easing:'cubic-bezier(.2,.85,.25,1)'});return;}catch(e){}}
-  p.style.transition='none';p.style.transform='translate('+dx+'px,'+dy+'px)';void p.offsetWidth;
-  p.style.transition='transform .48s cubic-bezier(.2,.85,.25,1)';p.style.transform='translate(0,0)';
-  setTimeout(()=>{p.style.transition='';p.style.transform='';},520);
+
+/* ============================================================
+   3. NAVEGAÇÃO
+   ============================================================ */
+var TITLES=['Capa','O que é o xadrez','De onde veio','A evolução do jogo','O tabuleiro',
+  'Desafio: encontre a casa','Posicionar o tabuleiro','As peças','Posição inicial','A regra da dama',
+  'O rei','A dama','A torre','O bispo','O cavalo','O peão','Captura','Xeque','Xeque-mate','Empate',
+  'Valor das peças','O poder do centro','Pense antes de jogar','Desafio final','Missão final'];
+var TOTAL=TITLES.length;
+var current=1,animToken=0;
+var enterHooks={};
+
+var pbar=$('#pbar');
+for(var i=0;i<TOTAL;i++){
+  var b=el('i',i%2?'alt':'');
+  pbar.appendChild(b);
 }
-function attacksSquare(pos,color,tgt){
-  const T=parseSq(tgt);
-  for(const coord in pos){const p=pos[coord];if(p.c!==color)continue;const{f,r}=parseSq(coord);
-    const df=T.f-f,dr=T.r-r,adf=Math.abs(df),adr=Math.abs(dr);
-    if(p.t==='n'){if(adf*adr===2&&adf+adr===3)return true;}
-    else if(p.t==='k'){if(Math.max(adf,adr)===1)return true;}
-    else if(p.t==='p'){const dir=color==='w'?1:-1;if(dr===dir&&adf===1)return true;}
-    else{const isD=adf===adr&&adf>0,isS=(df===0||dr===0)&&(adf+adr>0);
-      if(p.t==='b'&&!isD)continue;if(p.t==='r'&&!isS)continue;if(!isD&&!isS)continue;
-      const sf=Math.sign(df),sr=Math.sign(dr);let cf=f+sf,cr=r+sr,blk=false;
-      while(cf!==T.f||cr!==T.r){if(pos[sqName(cf,cr)]){blk=true;break;}cf+=sf;cr+=sr;}
-      if(!blk)return true;}}
-  return false;
-}
-function kingMoves(pos,color,kc){const{f,r}=parseSq(kc),out=[],en=color==='w'?'b':'w';
-  for(let df=-1;df<=1;df++)for(let dr=-1;dr<=1;dr++){if(!df&&!dr)continue;const nf=f+df,nr=r+dr;if(!inB(nf,nr))continue;
-    const n=sqName(nf,nr),occ=pos[n];if(occ&&occ.c===color)continue;
-    const np={...pos};delete np[kc];delete np[n];np[n]={t:'k',c:color};
-    if(!attacksSquare(np,en,n))out.push({coord:n,cap:!!occ});}
-  return out;}
-function sliderMoves(pos,color,coord){const{f,r}=parseSq(coord),out=[],dirs=[[1,1],[1,-1],[-1,1],[-1,-1],[1,0],[-1,0],[0,1],[0,-1]];
-  for(const[sf,sr]of dirs){let cf=f+sf,cr=r+sr;
-    while(inB(cf,cr)){const n=sqName(cf,cr),occ=pos[n];
-      if(!occ)out.push({coord:n,cap:false});else{if(occ.c!==color)out.push({coord:n,cap:true});break;}cf+=sf;cr+=sr;}}
-  return out;}
-const knightTargets=c=>{const{f,r}=parseSq(c),o=[];[[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]].forEach(([df,dr])=>{if(inB(f+df,r+dr))o.push(sqName(f+df,r+dr));});return o;};
-const slides=$$('.slide');let cur=0,enterTimer=null;let ENTER=null;
-const seqToken={};function killSeqs(){for(const k in seqToken)seqToken[k]++;}
-function newSeq(id){seqToken[id]=(seqToken[id]||0)+1;return seqToken[id];}
-const progress=$('#progress'),counter=$('#counter'),prevBtn=$('#prevBtn'),nextBtn=$('#nextBtn'),menu=$('#menu'),menuGrid=$('#menuGrid');
-slides.forEach((s,i)=>{const b=document.createElement('button');b.type='button';b.className='menu-item';b.innerHTML='<span class="mi-n">'+(i+1)+'</span> '+s.dataset.title;b.addEventListener('click',()=>{goTo(i);closeMenu();});menuGrid.appendChild(b);});
-function goTo(i){
-  if(i<0||i>=slides.length)return;
-  if(i===cur&&slides[i].classList.contains('active'))return;
-  killSeqs();clearTimeout(enterTimer);enterTimer=null;
-  slides[cur].classList.remove('active');cur=i;
-  const s=slides[cur];s.classList.add('active');s.scrollTop=0;
-  counter.textContent=(cur+1)+' / '+slides.length;
-  progress.style.width=((cur+1)/slides.length*100)+'%';
-  prevBtn.disabled=cur===0;nextBtn.disabled=cur===slides.length-1;
-  $$('.menu-item').forEach((m,j)=>m.classList.toggle('cur',j===cur));
-  if(ENTER&&ENTER[cur])enterTimer=setTimeout(()=>{ENTER[cur]();enterTimer=null;},animOff()?0:350);
-}
-prevBtn.addEventListener('click',()=>{sfx.nav();goTo(cur-1);});
-nextBtn.addEventListener('click',()=>{sfx.nav();goTo(cur+1);});
-$('#startBtn').addEventListener('click',()=>{sfx.ok();goTo(1);});
-$('#restartBtn').addEventListener('click',()=>{sfx.nav();goTo(0);});
-function openMenu(){menu.hidden=false;const c=menuGrid.querySelector('.cur');if(c)c.focus();}
-function closeMenu(){if(!menu.hidden){menu.hidden=true;$('#menuBtn').focus();}}
-$('#menuBtn').addEventListener('click',()=>{menu.hidden?openMenu():closeMenu();});
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){menu.hidden?openMenu():closeMenu();return;}
-  if(!menu.hidden)return;
-  if(e.key==='ArrowRight'){e.preventDefault();sfx.nav();goTo(cur+1);}
-  if(e.key==='ArrowLeft'){e.preventDefault();sfx.nav();goTo(cur-1);}
+var pbarCells=$$('#pbar i');
+
+var menuList=$('#menuList');
+TITLES.forEach(function(t,i){
+  var b=el('button','menu-item','<b>'+String(i+1).padStart(2,'0')+'</b> '+t);
+  b.type='button';
+  b.addEventListener('click',function(){closeMenu();goTo(i+1);});
+  menuList.appendChild(b);
 });
-let tx=0,ty=0;
-document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
-document.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
-  if(Math.abs(dx)>70&&Math.abs(dy)<50){if(e.target.closest('.board,button,a,.q-opt,svg'))return;sfx.nav();goTo(cur+(dx<0?1:-1));}},{passive:true});
-$('#soundBtn').addEventListener('click',function(){soundOn=!soundOn;this.textContent=soundOn?'🔊':'🔇';this.setAttribute('aria-pressed',String(soundOn));if(soundOn)sfx.ok();});
-function setAnimUI(){const off=animOff();$('#animBtn').setAttribute('aria-pressed',String(!off));$('#animBtn').classList.toggle('warn',off);$('#animLbl').textContent=off?'OFF':'ON';}
-$('#animBtn').addEventListener('click',()=>{document.documentElement.classList.toggle('anim-off');try{localStorage.setItem('xadrezAnim',animOff()?'off':'on');}catch(e){}setAnimUI();if(!animOff()){killSeqs();clearTimeout(enterTimer);if(ENTER&&ENTER[cur])ENTER[cur]();}sfx.nav();});
-function showToast(msg){const t=$('#toast');t.textContent='💡 '+msg+' (toque p/ fechar)';t.hidden=false;t.onclick=()=>{t.hidden=true;};setTimeout(()=>{t.hidden=true;},10000);}
-(function(){let sys=false;try{sys=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}let sv=null;try{sv=localStorage.getItem('xadrezAnim');}catch(e){}if(sys&&sv==null)showToast('Seu sistema desativa animações. Toque em 🎬 para ligar mesmo assim.');setAnimUI();})();
-function confetti(n=60){if(animOff())return;const box=document.createElement('div');box.className='confetti';const cols=['#e8b64c','#f6d489','#f0d9b5','#b58863','#ffffff'];
-  for(let i=0;i<n;i++){const p=document.createElement('i');p.style.left=Math.random()*100+'vw';p.style.background=cols[i%cols.length];p.style.animationDuration=(1.6+Math.random()*1.8)+'s';p.style.animationDelay=(Math.random()*0.6)+'s';box.appendChild(p);}
-  document.body.appendChild(box);setTimeout(()=>box.remove(),4200);}
-function banner(txt){const b=document.createElement('div');b.className='banner';b.innerHTML='<span>'+txt+'</span>';document.body.appendChild(b);setTimeout(()=>b.remove(),animOff()?1100:1600);}
-const INITIAL=[['a1','r','w'],['b1','n','w'],['c1','b','w'],['d1','q','w'],['e1','k','w'],['f1','b','w'],['g1','n','w'],['h1','r','w'],...Array.from({length:8},(_,i)=>[FILES[i]+'2','p','w']),['a8','r','b'],['b8','n','b'],['c8','b','b'],['d8','q','b'],['e8','k','b'],['f8','b','b'],['g8','n','b'],['h8','r','b'],...Array.from({length:8},(_,i)=>[FILES[i]+'7','p','b'])];
-const B1=buildBoard($('#board1'),{stagger:true,staggerMs:16});
-INITIAL.forEach(([c,t,cc],i)=>setP(B1,c,t,cc,300+i*35));
-B1._map['e1'].classList.add('glow');
-function countUps(){$$('#statCards .num').forEach(el=>{const tg=+el.dataset.count;if(animOff()){el.textContent=tg;return;}el.textContent='0';const t0=performance.now(),dur=900;const st=t=>{const k=Math.min(1,(t-t0)/dur);el.textContent=Math.round(tg*k*k);if(k<1)requestAnimationFrame(st);};requestAnimationFrame(st);});}
-const TL=[['🐘 Índia — o ancestral','Há cerca de 1.500 anos (séculos VI–VII) jogava-se na Índia o <b>Chaturanga</b>, geralmente considerado <b>um dos principais ancestrais do xadrez</b>. Não há certeza absoluta — mas os estudiosos concordam que a família do xadrez nasceu por lá.'],['👑 Pérsia — o “shah”','Virou o <b>Shatranj</b>. Acredita-se que “shah mat” (“o rei está encurralado”) originou <b>xeque-mate</b>!'],['🌙 Mundo árabe — os estudiosos','A partir do século VII os árabes estudaram e espalharam o jogo, levando-o à Europa.'],['🏰 Europa — o jogo dos reis','Na Idade Média virou paixão de nobres; as peças ganharam os nomes de hoje.'],['🌐 Xadrez moderno','Século XV: dama e bispo ganham movimentos rápidos. Século XIX: torneios e relógio. Hoje o mundo inteiro joga — até on-line!']];
-function showTL(i){$$('#timeline .t-node').forEach((n,j)=>n.classList.toggle('on',j===i));const d=$('#tlDetail');d.innerHTML='<h3>'+TL[i][0]+'</h3><p style="color:var(--muted)">'+TL[i][1]+'</p>';d.style.animation='none';void d.offsetWidth;d.style.animation='';}
-$$('#timeline .t-node').forEach(n=>n.addEventListener('click',()=>{sfx.move();showTL(+n.dataset.i);}));
-const E0=buildBoard($('#eraBoard0')),E1=buildBoard($('#eraBoard1')),E2=buildBoard($('#eraBoard2'));
-[['d8','🐘'],['e8','🛺'],['d7','⚔️'],['e7','⚔️'],['f6','🐴']].forEach(([c,e])=>{const sp=document.createElement('span');sp.className='piece';sp.textContent=e;sp.style.fontSize=E0._pfs;E0._map[c].appendChild(sp);});
-[['d8','q','b'],['e8','k','b'],['d7','p','b'],['e7','p','b'],['f6','n','b']].forEach(([c,t,cc])=>setP(E1,c,t,cc));
-[['d8','q','b'],['e8','k','b'],['d7','p','b'],['e7','p','b'],['f6','n','b'],['d1','q','w'],['e1','k','w'],['d2','p','w'],['e2','p','w'],['f3','n','w']].forEach(([c,t,cc])=>setP(E2,c,t,cc));
-$$('.era-btn').forEach(b=>b.addEventListener('click',()=>{sfx.move();$$('.era-btn').forEach(x=>x.classList.toggle('on',x===b));$$('.era-panel').forEach(p=>p.classList.toggle('on',p.dataset.i===b.dataset.i));}));
-const B5=buildBoard($('#board5'),{coords:true,stagger:true,staggerMs:14});
-Object.values(B5._map).forEach(sq=>{const show=()=>{$('#coordReadout').textContent=sq.dataset.coord;};sq.addEventListener('mouseenter',show);sq.addEventListener('click',()=>{show();sfx.move();});});
-const B6=buildBoard($('#board6'),{coords:true,clickable:true});let findTarget='e4';
-function findRound(t){findTarget=t||'e4';clearMarks(B6);$('#findMsg').textContent='';$('#findMsg').className='msg';
-  $('#findPrompt').innerHTML='Clique na casa <b style="color:var(--gold)">'+findTarget+'</b>!';$('#findNextBtn').hidden=true;
-  const cands=new Set([findTarget]);while(cands.size<4)cands.add(sqName(Math.floor(Math.random()*8),Math.floor(Math.random()*8)));
-  cands.forEach(c=>mark(B6,c,'cand'));}
-B6.addEventListener('click',e=>{const sq=e.target.closest('.sq');if(!sq||!sq.classList.contains('cand'))return;
-  const c=sq.dataset.coord,m=$('#findMsg');
-  if(c===findTarget){clearMarks(B6);mark(B6,c,'okmark');m.textContent='🎉 Muito bem! Achou a '+c+'!';m.className='msg good';sfx.ok();$('#findNextBtn').hidden=false;}
-  else{sq.classList.add('shake');setTimeout(()=>sq.classList.remove('shake'),450);m.textContent='Tente novamente! Dica: coluna '+findTarget[0]+', fileira '+findTarget[1]+'.';m.className='msg bad';sfx.bad();}});
-$('#findNextBtn').addEventListener('click',()=>{let n;do{n=sqName(Math.floor(Math.random()*8),Math.floor(Math.random()*8));}while(n===findTarget);sfx.nav();findRound(n);});
-const B7a=buildBoard($('#board7a'),{flipped:false}),B7b=buildBoard($('#board7b'),{flipped:true});
-[['board7a',true],['board7b',false]].forEach(([id,ok])=>{const el=$('#'+id);
-  const note=document.createElement('span');note.className='corner-note';note.textContent='direita →';note.style.fontSize='calc(min(80vw,34vh,260px)/8*0.34)';el.appendChild(note);
-  el.addEventListener('click',()=>{const item=el.closest('.orient-item'),m=$('#orientMsg');
-    if(ok){item.classList.add('win');item.classList.remove('lose');m.textContent='🎉 Isso! Casa clara no canto direito!';m.className='msg good';sfx.ok();}
-    else{item.classList.add('lose');setTimeout(()=>item.classList.remove('lose'),450);m.textContent='Ops! Canto direito escuro. Tente o outro!';m.className='msg bad';sfx.bad();}});});
-const PINFO={k:['Rei','1','A peça mais importante: se cai em xeque-mate, acaba o jogo. 👑'],q:['Dama','1','A mais poderosa: todas as direções, quantas casas quiser. 💪'],r:['Torre','2','Linha reta (fileiras e colunas). 🏰'],b:['Bispo','2','Só diagonais; um nas claras, outro nas escuras. ⛪'],n:['Cavalo','2','Anda em “L” e salta peças! 🐴'],p:['Peão','8','Anda pra frente, captura na diagonal. Sonha virar dama! 🌱']};
-$$('.piece-card').forEach(card=>card.addEventListener('click',()=>{sfx.move();$$('.piece-card').forEach(c=>c.classList.toggle('on',c===card));
-  const p=card.dataset.p,info=PINFO[p];
-  $('#pieceDetail').innerHTML='<span class="huge">'+GLYPH[p]+'</span><div><h3>'+info[0]+' <span class="chip">× <b>'+info[1]+'</b></span></h3><p style="color:var(--muted);margin-top:6px">'+info[2]+'</p></div>';}));
-const B9=buildBoard($('#board9'),{coords:true,clickable:true});
-INITIAL.forEach(([c,t,cc],i)=>setP(B9,c,t,cc,i*45));
-B9.addEventListener('click',e=>{const p=e.target.closest('.piece');if(!p)return;$('#nameReadout').textContent=NAMES[p.dataset.t]+' '+(p.dataset.c==='w'?'branco(a)':'preto(a)');sfx.move();});
-const B10=buildBoard($('#board10'),{coords:true});
-setP(B10,'d1','q','w',500);setP(B10,'d8','q','b',900);
-B10._map['d1'].classList.add('glow');B10._map['d8'].classList.add('glow');
-const B11=buildBoard($('#board11'),{coords:true,clickable:true});let posK;
-function kingInit(){posK=posObj([['e4','k','w'],['a5','r','b']]);clearMarks(B11);clearArrows(B11);renderPos(B11,posK);kingHi();$('#kingMsg').textContent='Toque numa casa dourada!';$('#kingMsg').className='msg gold';}
-function kingHi(){unmarkAll(B11,'hl');unmarkAll(B11,'hl-cap');unmarkAll(B11,'sel');const k=Object.keys(posK).find(c=>posK[c].t==='k'&&posK[c].c==='w');B11._map[k].classList.add('sel');kingMoves(posK,'w',k).forEach(m=>mark(B11,m.coord,m.cap?'hl-cap':'hl'));}
-B11.addEventListener('click',e=>{const sq=e.target.closest('.sq');if(!sq)return;const c=sq.dataset.coord,m=$('#kingMsg');
-  const k=Object.keys(posK).find(x=>posK[x].t==='k'&&posK[x].c==='w');
-  const legal=kingMoves(posK,'w',k).find(x=>x.coord===c);
-  if(legal){animateMove(B11,k,c);delete posK[k];if(legal.cap){delete posK[c];sfx.cap();}posK[c]={t:'k',c:'w'};setTimeout(()=>kingHi(),animOff()?0:500);m.textContent='✅ Boa! O rei nunca entra em casa atacada.';m.className='msg good';sfx.move();}
-  else{sq.classList.add('shake');setTimeout(()=>sq.classList.remove('shake'),450);m.textContent='🚫 Inválido: 1 casa e longe do ataque da torre!';m.className='msg bad';sfx.bad();}});
-$('#kingReset').addEventListener('click',()=>{sfx.nav();kingInit();});
-const B12=buildBoard($('#board12'),{coords:true,clickable:true});let posQ;
-/* NOVO: raios coloridos — azul = parte TORRE (retas), verde = parte BISPO (diagonais) */
-function drawQueenRays(el,pos,q){
-  clearArrows(el);
-  const{f,r}=parseSq(q);
-  const dirs=[[1,0,'#6aa5d8'],[-1,0,'#6aa5d8'],[0,1,'#6aa5d8'],[0,-1,'#6aa5d8'],[1,1,'#7ac074'],[1,-1,'#7ac074'],[-1,1,'#7ac074'],[-1,-1,'#7ac074']];
-  for(const[sf,sr,col]of dirs){
-    let cf=f+sf,cr=r+sr,last=null;
-    while(inB(cf,cr)){const n=sqName(cf,cr);last=n;if(pos[n])break;cf+=sf;cr+=sr;}
-    if(last&&last!==q)arrow(el,q,last,col,1.7,false);
+var menuItems=$$('.menu-item');
+
+function goTo(n,silent){
+  n=Math.max(1,Math.min(TOTAL,n));
+  var prev=$('#s'+current);
+  if(prev)prev.classList.remove('active');
+  current=n;
+  animToken++;
+  var next=$('#s'+n);
+  if(next)next.classList.add('active');
+  window.scrollTo(0,0);
+  $('#count').textContent=String(n).padStart(2,'0')+'/'+TOTAL;
+  $('#navTitle').textContent=TITLES[n-1];
+  pbar.setAttribute('aria-valuenow',n);
+  pbarCells.forEach(function(c,i){
+    c.classList.toggle('done',i<n-1);
+    c.classList.toggle('now',i===n-1);
+  });
+  menuItems.forEach(function(m,i){m.classList.toggle('current',i===n-1);});
+  $('#btnPrev').disabled=(n===1);
+  $('#btnNext').disabled=(n===TOTAL);
+  if(!silent)say('Seção '+n+' de '+TOTAL+': '+TITLES[n-1]);
+  var hook=enterHooks[n];
+  if(hook)try{hook(animToken);}catch(e){console.error(e);}
+}
+$('#btnPrev').addEventListener('click',function(){SFX.click();goTo(current-1);});
+$('#btnNext').addEventListener('click',function(){SFX.click();goTo(current+1);});
+$('#btnStart').addEventListener('click',function(){SFX.click();goTo(2);});
+
+function openMenu(){$('#menu').classList.add('open');$('#btnCloseMenu').focus();}
+function closeMenu(){
+  var wasOpen=$('#menu').classList.contains('open');
+  $('#menu').classList.remove('open');
+  if(wasOpen&&$('#btnMenu'))$('#btnMenu').focus();
+}
+$('#btnMenu').addEventListener('click',openMenu);
+$('#btnMenu2').addEventListener('click',openMenu);
+$('#btnCloseMenu').addEventListener('click',closeMenu);
+$('#menu').addEventListener('click',function(e){if(e.target===this)closeMenu();});
+
+$('#btnSound').addEventListener('click',function(){
+  soundOn=!soundOn;
+  this.textContent=soundOn?'🔊':'🔇';
+  this.setAttribute('aria-pressed',soundOn?'true':'false');
+  if(soundOn)SFX.ok();
+  toast(soundOn?'Som ligado':'Som desligado');
+});
+
+document.addEventListener('keydown',function(e){
+  var tag=(document.activeElement&&document.activeElement.tagName)||'';
+  if(e.key==='Escape'){
+    if($('#menu').classList.contains('open'))closeMenu();else openMenu();
+    e.preventDefault();return;
+  }
+  if($('#menu').classList.contains('open'))return;
+  if(tag==='BUTTON'&&(e.key===' '||e.key==='Enter'))return;
+  if(e.key==='ArrowRight'){goTo(current+1);e.preventDefault();}
+  if(e.key==='ArrowLeft'){goTo(current-1);e.preventDefault();}
+  if(e.key==='Home'){goTo(1);e.preventDefault();}
+  if(e.key==='End'){goTo(TOTAL);e.preventDefault();}
+});
+/* deslizar o dedo para trocar de seção */
+var tx=0,ty=0;
+document.addEventListener('touchstart',function(e){tx=e.changedTouches[0].clientX;ty=e.changedTouches[0].clientY;},{passive:true});
+document.addEventListener('touchend',function(e){
+  var dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>90&&Math.abs(dx)>Math.abs(dy)*2){
+    if(e.target.closest&&e.target.closest('.board'))return;
+    goTo(current+(dx<0?1:-1));
+  }
+},{passive:true});
+
+function confetti(){
+  if(reduced())return;
+  var wrap=el('div','confetti');
+  var cols=['#e9b949','#f7d788','#f6efe2','#5fbf7d','#a8842f'];
+  for(var i=0;i<44;i++){
+    var p=el('i');
+    p.style.left=Math.random()*100+'%';
+    p.style.background=cols[i%cols.length];
+    p.style.animationDuration=(1.6+Math.random()*1.4)+'s';
+    p.style.animationDelay=(Math.random()*.5)+'s';
+    p.style.transform='rotate('+Math.random()*360+'deg)';
+    wrap.appendChild(p);
+  }
+  document.body.appendChild(wrap);
+  setTimeout(function(){wrap.remove();},3600);
+}
+
+/* ============================================================
+   4. POSIÇÕES PADRÃO
+   ============================================================ */
+var BACK=['R','N','B','Q','K','B','N','R'];
+function initialPosition(){
+  var pos={};
+  for(var f=0;f<8;f++){
+    pos[nm(f,0)]='w'+BACK[f];
+    pos[nm(f,1)]='wP';
+    pos[nm(f,6)]='bP';
+    pos[nm(f,7)]='b'+BACK[f];
+  }
+  return pos;
+}
+
+/* ============================================================
+   5. TELA 01 · CAPA
+   ============================================================ */
+var coverBoard=new Board($('#boardCover'));
+enterHooks[1]=function(tk){
+  coverBoard.clear();
+  var pos=initialPosition();
+  var order=Object.keys(pos);
+  order.sort(function(a,b){return idx(a)[1]-idx(b)[1];});
+  if(reduced()){
+    order.forEach(function(sq){coverBoard.put(sq,pos[sq]);});
+  }else{
+    order.forEach(function(sq,i){
+      setTimeout(function(){
+        if(tk!==animToken)return;
+        coverBoard.put(sq,pos[sq],true,0);
+      },i*32);
+    });
+    setTimeout(function(){
+      if(tk!==animToken)return;
+      coverBoard.mark('e1','hl-soft');coverBoard.mark('e8','hl-soft');
+      $('#coverWrap').classList.add('settled');
+    },1300);
+  }
+};
+
+/* ============================================================
+   6. TELA 02 · O QUE É
+   ============================================================ */
+var STATS=[
+  {n:'2',l:'jogadores',h:'Brancas sempre começam. Depois joga um de cada vez, sem pressa e sem sorte.'},
+  {n:'64',l:'casas',h:'Oito colunas por oito fileiras. Metade clara, metade escura.'},
+  {n:'32',l:'peças',h:'Dezesseis de cada cor no começo. Elas vão diminuindo conforme a partida avança.'},
+  {n:'1',l:'objetivo',h:'Xeque-mate: prender o rei adversário de um jeito que ele não consiga escapar.'}
+];
+(function(){
+  var wrap=$('#statCards');
+  STATS.forEach(function(s){
+    var c=el('button','card statcard',
+      '<div class="num">'+s.n+'</div><div class="lbl">'+s.l+'</div><div class="hint">'+s.h+'</div>');
+    c.type='button';
+    c.addEventListener('click',function(){
+      var wasOpen=c.classList.contains('open');
+      $$('.statcard').forEach(function(x){x.classList.remove('open');});
+      if(!wasOpen){c.classList.add('open');SFX.click();}
+    });
+    wrap.appendChild(c);
+  });
+})();
+
+/* ============================================================
+   7. TELA 03 · ORIGEM
+   ============================================================ */
+var TL=[
+  {ico:'🕌',yr:'por volta do séc. VI',nm:'Índia',
+   txt:'O Chaturanga é praticado no norte da Índia. Ele já tinha um tabuleiro de 64 casas e peças com funções diferentes, inspiradas em um exército: infantaria, cavalaria, elefantes e carros. É geralmente apontado como um dos principais ancestrais do xadrez.'},
+  {ico:'🏺',yr:'séc. VI–VII',nm:'Pérsia',
+   txt:'Na Pérsia o jogo passa a se chamar Chatrangue. Dali vêm duas palavras que usamos até hoje: xeque, do persa "xá" (rei), e xeque-mate, ligado à ideia de que o rei foi encurralado.'},
+  {ico:'🌙',yr:'séc. VIII em diante',nm:'Mundo árabe',
+   txt:'Com a expansão árabe o jogo se espalha e ganha os primeiros estudos escritos, com problemas e aberturas anotadas. Foi principalmente por esse caminho que ele chegou à Europa.'},
+  {ico:'🏰',yr:'séc. X–XV',nm:'Europa',
+   txt:'Na Europa medieval as peças ganham nomes da sociedade da época: rei, dama, bispo, cavalo, torre. Por muito tempo a dama era uma peça fraca, bem diferente da que conhecemos.'},
+  {ico:'♛',yr:'a partir do séc. XV–XVI',nm:'Xadrez moderno',
+   txt:'A dama e o bispo ganham o alcance longo que têm hoje e a partida fica muito mais rápida. As regras terminam de se padronizar entre os séculos XIX e XX, junto com os primeiros grandes torneios internacionais.'}
+];
+(function(){
+  var wrap=$('#timeline');
+  TL.forEach(function(t,i){
+    var b=el('button','tl-node','<div class="ico">'+t.ico+'</div><div class="nm">'+t.nm+'</div><div class="yr">'+t.yr+'</div>');
+    b.type='button';
+    b.addEventListener('click',function(){
+      $$('.tl-node').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');SFX.click();
+      $('#tlInfo').innerHTML='<h3 style="margin-bottom:6px">'+t.ico+' '+t.nm+' <span class="small" style="font-family:var(--f-mono)">'+t.yr+'</span></h3><p style="margin:0">'+t.txt+'</p>';
+    });
+    wrap.appendChild(b);
+    if(i<TL.length-1)wrap.appendChild(el('div','','<span class="small" style="align-self:center;color:var(--gold-dim)">→</span>'));
+  });
+})();
+
+enterHooks[3]=function(){
+  if(!$('.tl-node.on'))$$('.tl-node')[0].click();
+};
+
+/* ============================================================
+   8. TELA 04 · EVOLUÇÃO
+   ============================================================ */
+var EVO=[
+  {k:'Chaturanga',sub:'Índia, por volta do séc. VI',pieces:['bP','bN','bR'],
+   txt:'Tabuleiro de 64 casas, quatro tipos de peça inspirados em um exército e um conselheiro ao lado do rei que andava só uma casa na diagonal. O jogo era mais lento, porque quase nenhuma peça tinha alcance longo.'},
+  {k:'Xadrez medieval',sub:'Europa, séc. X–XV',pieces:['bB','bQ','bK'],
+   txt:'As peças ganham roupagem europeia e viram rei, dama, bispo, cavalo e torre. A dama ainda era fraca e o bispo tinha alcance curto, então as partidas continuavam demoradas.'},
+  {k:'Xadrez moderno',sub:'do séc. XV–XVI até hoje',pieces:['wQ','wB','wK'],
+   txt:'A dama passa a percorrer o tabuleiro inteiro e o bispo ganha a diagonal completa. O jogo fica rápido e agressivo, e é essa versão que você vai aprender aqui.'}
+];
+var evoIdx=0;
+(function(){
+  var chips=$('#evoChips'),cards=$('#evoCards');
+  EVO.forEach(function(e,i){
+    var c=el('button','chip'+(i===0?' on':''),e.k);
+    c.type='button';
+    c.addEventListener('click',function(){setEvo(i);});
+    chips.appendChild(c);
+    var card=el('div','card evo-card');
+    card.innerHTML='<div class="art">'+e.pieces.map(function(p){
+      return '<svg viewBox="0 0 45 45" class="pc '+(p.charAt(0)==='w'?'w':'b')+'" style="width:52px;height:52px;display:inline-block" aria-hidden="true"><use href="#pc-'+p.charAt(1).toLowerCase()+'"/></svg>';
+    }).join('')+'</div><h3 style="margin-bottom:2px">'+e.k+'</h3><div class="small">'+e.sub+'</div>';
+    cards.appendChild(card);
+  });
+  setEvo(0);
+})();
+function setEvo(i){
+  evoIdx=i;SFX.click();
+  $$('#evoChips .chip').forEach(function(c,j){c.classList.toggle('on',j===i);});
+  $$('#evoCards .evo-card').forEach(function(c,j){c.classList.toggle('dim',j!==i);});
+  $('#evoText').textContent=EVO[i].txt;
+}
+
+/* ============================================================
+   9. TELA 05 · TABULEIRO
+   ============================================================ */
+var b5=new Board($('#board5'));
+b5.coordsBar($('#ranks5'),$('#files5'));
+(function(){
+  var ro=$('#sqReadout');
+  function show(sq){
+    var p=idx(sq);
+    setReadout(ro,sq+'  ·  coluna '+sq[0]+', fileira '+sq[1]+'  ·  casa '+(isLight(p[0],p[1])?'clara':'escura'));
+  }
+  b5.el.addEventListener('mousemove',function(e){
+    var c=e.target.closest?e.target.closest('.sq'):null;
+    if(c)show(c.dataset.sq);
+  });
+  b5.el.addEventListener('mouseleave',function(){
+    setReadout(ro,'Passe o dedo ou o mouse sobre uma casa.');
+  });
+  b5.onSquare(function(sq,c){
+    b5.clearMarks();c.classList.add('hl');show(sq);SFX.click();
+  });
+  var chips=[
+    {k:'Colunas (a–h)',f:function(){
+      b5.clearMarks();
+      ['a','c','e','g'].forEach(function(L){
+        for(var r=0;r<8;r++)b5.mark(L+(r+1),'file-hl');
+      });
+      setReadout($('#sqReadout'),'Colunas: as oito filas em pé, da letra a até a letra h.');
+    }},
+    {k:'Fileiras (1–8)',f:function(){
+      b5.clearMarks();
+      [1,3,5,7].forEach(function(n){
+        for(var f=0;f<8;f++)b5.mark(nm(f,n-1),'rank-hl');
+      });
+      setReadout($('#sqReadout'),'Fileiras: as oito filas deitadas, numeradas de 1 a 8.');
+    }},
+    {k:'64 casas',f:function(){
+      b5.clearMarks();
+      var i=0;
+      Object.keys(b5.cells).forEach(function(k){
+        var c=b5.cells[k];
+        setTimeout(function(){c.classList.add('hl-soft');setTimeout(function(){c.classList.remove('hl-soft');},420);},(i++)*14);
+      });
+      setReadout($('#sqReadout'),'8 colunas × 8 fileiras = 64 casas, alternando clara e escura.');
+    }},
+    {k:'Casa e4',f:function(){
+      b5.clearMarks();b5.mark('e4','hl');
+      for(var r=0;r<8;r++)if(r!==3)b5.mark('e'+(r+1),'file-hl');
+      for(var f=0;f<8;f++)if(f!==4)b5.mark(nm(f,3),'rank-hl');
+      setReadout($('#sqReadout'),'e4 é o encontro da coluna e com a fileira 4.');
+    }}
+  ];
+  var bar=$('#boardChips');
+  chips.forEach(function(c){
+    var b=el('button','chip',c.k);b.type='button';
+    b.addEventListener('click',function(){
+      $$('#boardChips .chip').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');SFX.click();c.f();
+    });
+    bar.appendChild(b);
+  });
+})();
+
+/* ============================================================
+   10. TELA 06 · DESAFIO ENCONTRE A CASA
+   ============================================================ */
+var b6=new Board($('#board6'));
+b6.coordsBar($('#ranks6'),$('#files6'));
+var target6='e4',streak6=0,lock6=false;
+function newTarget(){
+  var f=Math.floor(Math.random()*8),r=Math.floor(Math.random()*8);
+  var s=nm(f,r);
+  if(s===target6)return newTarget();
+  target6=s;lock6=false;
+  $('#targetSq').textContent=s;
+  b6.clearMarks();
+  setReadout($('#findReadout'),'Clique na casa '+s+'.');
+  say('Nova casa: '+s);
+}
+b6.onSquare(function(sq,c){
+  if(lock6)return;
+  if(sq===target6){
+    lock6=true;
+    b6.clearMarks();c.classList.add('good');
+    streak6++;$('#findStreak').textContent=streak6;
+    setReadout($('#findReadout'),'🎉 Muito bem! Essa é a casa '+sq+'.','ok');
+    SFX.ok();
+    if(streak6>0&&streak6%5===0)confetti();
+    setTimeout(function(){if(current===6)newTarget();},1300);
+  }else{
+    c.classList.remove('bad');void c.offsetWidth;c.classList.add('bad');
+    setTimeout(function(){c.classList.remove('bad');},700);
+    streak6=0;$('#findStreak').textContent=0;
+    setReadout($('#findReadout'),'Tente novamente! Você clicou em '+sq+' e o alvo é '+target6+'.','no');
+    SFX.no();
+  }
+});
+$('#btnNewSq').addEventListener('click',function(){SFX.click();newTarget();});
+$('#btnHelpSq').addEventListener('click',function(){
+  SFX.click();
+  b6.clearMarks();
+  var p=idx(target6);
+  for(var r=0;r<8;r++)b6.mark(target6[0]+(r+1),'file-hl');
+  for(var f=0;f<8;f++)b6.mark(nm(f,p[1]),'rank-hl');
+  setReadout($('#findReadout'),'A coluna '+target6[0]+' e a fileira '+target6[1]+' se cruzam na casa certa.');
+});
+enterHooks[6]=function(){newTarget();};
+
+/* ============================================================
+   11. TELA 07 · ORIENTAÇÃO
+   ============================================================ */
+(function(){
+  var wrap=$('#orientPair');
+  var correctFirst=Math.random()<0.5;
+  [0,1].forEach(function(i){
+    var isRight=(i===0)===correctFirst;
+    var card=el('div','card center');
+    card.style.cursor='pointer';
+    card.innerHTML='<div class="board-wrap nocoord" style="--bw:280px"><div class="board"></div></div><div class="small" style="margin-top:10px">Opção '+(i+1)+'</div>';
+    var bd=new Board($('.board',card),{mirror:!isRight});
+    card.tabIndex=0;card.setAttribute('role','button');
+    card.setAttribute('aria-label','Opção '+(i+1)+' de posicionamento do tabuleiro');
+    var pick=function(){
+      var ro=$('#orientReadout');
+      if(isRight){
+        SFX.ok();
+        setReadout(ro,'🎉 Isso mesmo! A casa do canto de baixo à direita é clara (h1).','ok');
+        bd.mark('h1','good');
+        card.style.borderColor='var(--ok)';
+        confetti();
+      }else{
+        SFX.no();
+        setReadout(ro,'Tente novamente. Repare no canto de baixo à direita deste tabuleiro: ele é escuro.','no');
+        bd.mark('a1','bad');bd.mark('h1','hl-soft');
+        card.classList.add('shake');
+        setTimeout(function(){card.classList.remove('shake');bd.unmark('a1','bad');},900);
+      }
+    };
+    card.addEventListener('click',pick);
+    card.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();}});
+    wrap.appendChild(card);
+  });
+})();
+
+/* ============================================================
+   12. TELA 08 · PEÇAS
+   ============================================================ */
+var PIECES=[
+  {c:'K',n:'Rei',q:'1 de cada lado',d:'A peça mais importante e uma das mais lentas: anda apenas uma casa por vez, em qualquer direção. Ele nunca é capturado de verdade; a partida acaba quando ele não tem mais como escapar.'},
+  {c:'Q',n:'Dama',q:'1 de cada lado',d:'A peça mais poderosa. Anda quantas casas quiser na horizontal, na vertical e na diagonal. Justamente por valer tanto, precisa ser usada com cuidado para não ser perdida à toa.'},
+  {c:'R',n:'Torre',q:'2 de cada lado',d:'Anda quantas casas quiser em linha reta, para frente, para trás e para os lados. Nunca na diagonal. Fica muito forte em colunas abertas, sem peões pela frente.'},
+  {c:'B',n:'Bispo',q:'2 de cada lado',d:'Anda quantas casas quiser na diagonal. Cada bispo nasce em uma cor de casa e passa a partida inteira nela: um anda só nas claras, o outro só nas escuras.'},
+  {c:'N',n:'Cavalo',q:'2 de cada lado',d:'A única peça que salta por cima das outras. Faz um movimento em L: duas casas em uma direção e mais uma casa de lado. Chega em lugares que nenhuma outra peça alcança.'},
+  {c:'P',n:'Peão',q:'8 de cada lado',d:'Anda uma casa para a frente e nunca volta atrás. Captura na diagonal, o que confunde bastante no começo. Se conseguir chegar ao outro lado do tabuleiro, vira outra peça, quase sempre uma dama.'}
+];
+(function(){
+  var bar=$('#pieceBar');
+  PIECES.forEach(function(p,i){
+    var b=el('button','pbtn'+(i===0?' on':''),
+      '<svg viewBox="0 0 45 45" class="pc w" aria-hidden="true"><use href="#pc-'+p.c.toLowerCase()+'"/></svg>');
+    b.type='button';b.setAttribute('aria-label',p.n);
+    b.addEventListener('click',function(){
+      $$('#pieceBar .pbtn').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');SFX.click();showPiece(i);
+    });
+    bar.appendChild(b);
+  });
+  showPiece(0);
+})();
+function showPiece(i){
+  var p=PIECES[i];
+  $('#pieceDetail').innerHTML=
+    '<svg viewBox="0 0 45 45" class="pc w big" aria-hidden="true"><use href="#pc-'+p.c.toLowerCase()+'"/></svg>'+
+    '<div><h3 style="margin-bottom:4px">'+p.n+'</h3><span class="pill gold">'+p.q+'</span>'+
+    '<p style="margin:10px 0 0">'+p.d+'</p></div>';
+}
+
+/* ============================================================
+   13. TELA 09 · POSIÇÃO INICIAL
+   ============================================================ */
+var b9=new Board($('#board9'));
+b9.coordsBar($('#ranks9'),$('#files9'));
+function setup9(tk){
+  b9.clear();
+  var pos=initialPosition();
+  var order=Object.keys(pos).sort(function(a,b){
+    var ra=idx(a)[1],rb=idx(b)[1];
+    var sa=(ra===0?0:ra===1?1:ra===7?2:3),sb=(rb===0?0:rb===1?1:rb===7?2:3);
+    return sa-sb||idx(a)[0]-idx(b)[0];
+  });
+  setReadout($('#initReadout'),'Clique em uma peça para ver o nome dela.');
+  if(reduced()){
+    order.forEach(function(sq){b9.put(sq,pos[sq]).classList.add('clickable');});
+    return;
+  }
+  order.forEach(function(sq,i){
+    setTimeout(function(){
+      if(tk!==animToken)return;
+      var p=b9.put(sq,pos[sq],true,0);
+      if(p)p.classList.add('clickable');
+      if(i%4===0)SFX.move();
+    },i*70);
+  });
+}
+b9.onSquare(function(sq){
+  var p=b9.pieces[sq];
+  if(!p){setReadout($('#initReadout'),'A casa '+sq+' está vazia no começo da partida.');return;}
+  b9.clearMarks();b9.mark(sq,'hl');
+  SFX.click();
+  setReadout($('#initReadout'),NAMES[p.code.charAt(1)]+' '+COLORSF[p.code.charAt(0)]+' · casa '+sq);
+});
+enterHooks[9]=function(tk){setup9(tk);};
+$('#btnReplay9').addEventListener('click',function(){SFX.click();setup9(++animToken);});
+
+/* ============================================================
+   14. TELA 10 · REGRA DA DAMA
+   ============================================================ */
+var b10=new Board($('#board10'));
+b10.coordsBar($('#ranks10'),$('#files10'));
+function setup10(tk){
+  b10.clear();b10.clearMarks();
+  var seq=[['d1','wQ'],['e1','wK'],['d8','bQ'],['e8','bK']];
+  if(reduced()){
+    seq.forEach(function(s){b10.put(s[0],s[1]);});
+    b10.mark('d1','hl-soft');b10.mark('d8','hl-soft');
+    return;
+  }
+  seq.forEach(function(s,i){
+    setTimeout(function(){
+      if(tk!==animToken)return;
+      b10.put(s[0],s[1],true,0);SFX.move();
+      if(s[1].charAt(1)==='Q')b10.mark(s[0],'hl-soft');
+    },300+i*520);
+  });
+}
+enterHooks[10]=function(tk){setup10(tk);};
+$('#btnReplay10').addEventListener('click',function(){SFX.click();setup10(++animToken);});
+
+/* ============================================================
+   15. TELAS 11–16 · MOVIMENTOS
+   ============================================================ */
+function buildMoveScreen(cfg){
+  var sec=$('#s'+cfg.n);
+  sec.innerHTML=
+    '<div class="eyebrow">Seção '+String(cfg.n).padStart(2,'0')+'</div>'+
+    '<h2>'+cfg.title+'</h2>'+
+    '<div class="grid2"><div class="stack">'+
+      '<p class="lead">'+cfg.lead+'</p>'+
+      '<div class="card"><p style="margin:0">'+cfg.rule+'</p></div>'+
+      (cfg.chips?'<div class="chips" id="chips'+cfg.n+'"></div>':'')+
+      '<div class="readout" id="rd'+cfg.n+'">'+cfg.hint+'</div>'+
+      '<div class="wrapc" id="acts'+cfg.n+'"></div>'+
+      (cfg.note?'<p class="small">'+cfg.note+'</p>':'')+
+    '</div>'+
+    '<div class="board-wrap" id="wrap'+cfg.n+'" style="--bw:420px">'+
+      '<div class="ranks" id="ranks'+cfg.n+'"></div>'+
+      '<div class="board" id="board'+cfg.n+'" role="grid" aria-label="Tabuleiro: '+cfg.title+'"></div>'+
+      '<div class="files" id="files'+cfg.n+'"></div>'+
+    '</div></div>';
+
+  var bd=new Board($('#board'+cfg.n));
+  bd.coordsBar($('#ranks'+cfg.n),$('#files'+cfg.n));
+  var ro=$('#rd'+cfg.n);
+  var state={pos:null,from:null,found:{},total:0};
+
+  function reset(){
+    state.pos={};
+    Object.keys(cfg.pos).forEach(function(k){state.pos[k]=cfg.pos[k];});
+    state.from=cfg.from;state.found={};
+    bd.position(state.pos);
+    bd.clearMarks();
+    refresh();
+    setReadout(ro,cfg.hint);
+  }
+  function refresh(){
+    bd.clearMarks();
+    var m=legalMoves(state.pos,state.from);
+    state.total=m.all.length;
+    bd.mark(state.from,'hl-soft');
+    if(cfg.mode==='move'){
+      m.moves.forEach(function(s){bd.dot(s,false);});
+      m.caps.forEach(function(s){bd.dot(s,true);});
+    }else{
+      Object.keys(state.found).forEach(function(s){bd.mark(s,'good');});
+    }
+    return m;
+  }
+  bd.onSquare(function(sq){
+    var m=legalMoves(state.pos,state.from);
+    var ok=m.all.indexOf(sq)>-1;
+    if(cfg.mode==='move'){
+      if(sq===state.from)return;
+      if(!ok){
+        SFX.no();
+        var c=bd.cells[sq];c.classList.add('bad');
+        setTimeout(function(){c.classList.remove('bad');},650);
+        setReadout(ro,'Movimento inválido: '+NAMES[cfg.pos[cfg.from].charAt(1)].toLowerCase()+' não alcança '+sq+'. '+(cfg.invalidTip||''),'no');
+        return;
+      }
+      var cap=m.caps.indexOf(sq)>-1;
+      var from=state.from;
+      delete state.pos[from];
+      state.pos[sq]=cfg.pos[cfg.from];
+      state.from=sq;
+      bd.clearMarks();
+      bd.move(from,sq,function(){refresh();});
+      if(cap){SFX.cap();setReadout(ro,'Captura em '+sq+'! A peça adversária sai do tabuleiro.','ok');}
+      else{SFX.move();setReadout(ro,'Boa. '+from+' → '+sq+'.','ok');}
+    }else{
+      if(state.found[sq]){setReadout(ro,'Essa você já encontrou. Faltam '+(m.all.length-Object.keys(state.found).length)+'.');return;}
+      if(ok){
+        state.found[sq]=true;SFX.ok();
+        bd.mark(sq,'good');
+        var falta=m.all.length-Object.keys(state.found).length;
+        if(falta===0){
+          setReadout(ro,'🎉 Todas as '+m.all.length+' casas encontradas!','ok');
+          SFX.win();confetti();
+        }else{
+          setReadout(ro,'✅ '+sq+' está certa. Faltam '+falta+' de '+m.all.length+'.','ok');
+        }
+      }else{
+        SFX.no();
+        var cc=bd.cells[sq];cc.classList.add('bad');
+        setTimeout(function(){cc.classList.remove('bad');},650);
+        setReadout(ro,'❌ '+sq+' não. '+(cfg.invalidTip||''),'no');
+      }
+    }
+  });
+
+  var acts=$('#acts'+cfg.n);
+  var bReset=el('button','btn ghost sm','Reiniciar');
+  bReset.type='button';
+  bReset.addEventListener('click',function(){SFX.click();reset();});
+  if(cfg.mode==='move'){
+    var bShow=el('button','btn sm','Mostrar todos os movimentos');
+    bShow.type='button';
+    bShow.addEventListener('click',function(){
+      SFX.click();
+      var m=refresh();
+      setReadout(ro,'Daqui a peça alcança '+m.all.length+' casa(s): '+m.all.sort().join(', ')+'.');
+    });
+    acts.appendChild(bShow);
+  }else{
+    var bGive=el('button','btn sm','Mostrar a resposta');
+    bGive.type='button';
+    bGive.addEventListener('click',function(){
+      SFX.click();
+      var m=legalMoves(state.pos,state.from);
+      m.all.forEach(function(s){state.found[s]=true;bd.mark(s,'good');});
+      setReadout(ro,'São '+m.all.length+' casas: '+m.all.sort().join(', ')+'.');
+    });
+    acts.appendChild(bGive);
+  }
+  acts.appendChild(bReset);
+  if(cfg.chips){
+    var cw=$('#chips'+cfg.n);
+    cfg.chips.forEach(function(ch,i){
+      var b=el('button','chip'+(i===0?' on':''),ch.k);
+      b.type='button';
+      b.addEventListener('click',function(){
+        $$('.chip',cw).forEach(function(x){x.classList.remove('on');});
+        b.classList.add('on');SFX.click();
+        ch.f(bd,state,ro,reset);
+      });
+      cw.appendChild(b);
+    });
+  }
+  enterHooks[cfg.n]=function(){reset();if(cfg.onEnter)cfg.onEnter(bd,state,ro);};
+  return {board:bd,reset:reset};
+}
+
+buildMoveScreen({
+  n:11,title:'O rei ♔',mode:'move',
+  lead:'O rei anda <b>uma casa por vez</b>, em qualquer das oito direções: para os lados, para frente, para trás e nas diagonais. Ele é lento, e por isso costuma ficar protegido em um canto durante boa parte da partida.',
+  rule:'Clique em uma das casas marcadas para movimentar o rei. Se você clicar em uma casa longe demais, o tabuleiro avisa: movimentos ilegais não acontecem.',
+  hint:'As bolinhas mostram para onde o rei pode ir agora.',
+  invalidTip:'O rei nunca pula casas.',
+  pos:{e4:'wK',e5:'bP',d3:'wP'},from:'e4',
+  note:'A casa d3 tem um peão branco. Nenhuma peça pode ocupar a casa de uma companheira, então essa direção está fechada para o rei. Já o peão preto em e5 pode ser capturado.'
+});
+
+buildMoveScreen({
+  n:12,title:'A dama ♕',mode:'move',
+  lead:'A dama junta o poder da torre e o do bispo: ela percorre <b>quantas casas quiser</b> na horizontal, na vertical e na diagonal. É a peça mais forte do jogo, mas não salta sobre ninguém.',
+  rule:'Clique em qualquer casa marcada para mover a dama. Repare que ela para logo antes de uma peça companheira e para em cima de uma peça adversária, capturando.',
+  hint:'Olhe quantas casas a dama controla de uma vez só.',
+  invalidTip:'A dama anda em linha reta ou diagonal, sem desviar e sem pular.',
+  pos:{d4:'wQ',d6:'wP',g7:'bN'},from:'d4',
+  note:'O peão branco em d6 bloqueia a subida pela coluna d. O cavalo preto em g7 está na diagonal e pode ser capturado.'
+});
+
+buildMoveScreen({
+  n:13,title:'A torre ♖',mode:'find',
+  lead:'A torre anda em <b>linha reta</b>: para cima, para baixo, para a esquerda e para a direita, quantas casas quiser. Ela nunca anda na diagonal.',
+  rule:'Desafio: clique nas casas que a torre de d4 consegue alcançar. Cuidado com as peças no caminho, porque a torre não salta sobre nada.',
+  hint:'Encontre todas as casas alcançáveis pela torre.',
+  invalidTip:'Ou a casa está na diagonal, ou tem alguma peça bloqueando o caminho.',
+  pos:{d4:'wR',d6:'wP',g4:'bP'},from:'d4',
+  note:'A torre para antes do peão branco de d6, que é companheiro, e para em cima do peão preto de g4, capturando.'
+});
+
+buildMoveScreen({
+  n:14,title:'O bispo ♗',mode:'move',
+  lead:'O bispo anda <b>na diagonal</b>, quantas casas quiser. Como toda diagonal mantém a mesma cor de casa, o bispo que começa em casa clara passa a partida inteira nas casas claras, e o outro só nas escuras.',
+  rule:'Mova o bispo e observe a cor das casas por onde ele passa. Ela nunca muda.',
+  hint:'Repare: todas as casas marcadas têm a mesma cor da casa do bispo.',
+  invalidTip:'Se a casa tem cor diferente da casa do bispo, ele nunca vai chegar lá.',
+  pos:{f1:'wB',c5:'bP'},from:'f1',
+  note:'Repare no peão preto de c5: ele está em uma casa escura, e este bispo só anda nas claras. Por mais que a partida dure, este bispo nunca vai conseguir capturar aquele peão.',
+  chips:[
+    {k:'Ver o bispo percorrer a diagonal',f:function(bd,st,ro){
+      var path=['e2','d3','c4','b5','a6'];
+      if(st.from!=='f1'){setReadout(ro,'Aperte Reiniciar primeiro para o bispo voltar a f1.');return;}
+      var i=0;
+      (function step(){
+        if(i>=path.length){setReadout(ro,'Da casa f1 até a6: cinco casas, todas claras.','ok');return;}
+        var to=path[i],from=i===0?'f1':path[i-1];
+        st.pos[to]=st.pos[from];delete st.pos[from];st.from=to;
+        bd.clearMarks();bd.mark(to,'hl-soft');
+        bd.move(from,to);SFX.move();
+        i++;setTimeout(step,reduced()?60:520);
+      })();
+    }},
+    {k:'Ver as duas cores',f:function(bd,st,ro,reset){
+      reset();
+      bd.clearMarks();
+      for(var f=0;f<8;f++)for(var r=0;r<8;r++){
+        if(isLight(f,r))bd.mark(nm(f,r),'hl-soft');
+      }
+      setReadout(ro,'Um bispo cuida das 32 casas claras e o outro das 32 escuras. Juntos eles cobrem o tabuleiro inteiro.');
+    }}
+  ]
+});
+
+buildMoveScreen({
+  n:15,title:'O cavalo ♘',mode:'find',
+  lead:'O cavalo é a peça mais diferente de todas. Ele anda em <b>L</b>: duas casas em uma direção e mais uma casa virando para o lado. E é o único que <b>salta por cima</b> de qualquer peça, sua ou do adversário.',
+  rule:'Desafio: o cavalo está em d4, cercado de peões. Clique em <b>todas as casas</b> que ele consegue alcançar. Dica: da casa d4 são oito.',
+  hint:'Conte dois passos em uma direção e mais um virando. Encontre as oito casas.',
+  invalidTip:'Lembre do L: 2 + 1. Nunca em linha reta, nunca em diagonal fechada.',
+  pos:{d4:'wN',c4:'wP',d5:'wP',e4:'wP',d3:'wP'},from:'d4',
+  note:'Os peões em volta não atrapalham em nada: o cavalo pula sobre eles. Nenhuma outra peça do jogo consegue fazer isso.'
+});
+
+/* TELA 16 · PEÃO (roteiro em três cenas) */
+(function(){
+  var sec=$('#s16');
+  sec.innerHTML=
+    '<div class="eyebrow">Seção 16</div><h2>O peão ♙</h2>'+
+    '<div class="grid2"><div class="stack">'+
+      '<p class="lead">O peão é a peça mais numerosa e a única que <b>anda de um jeito e captura de outro</b>. Ele nunca volta atrás: cada casa avançada é definitiva.</p>'+
+      '<div class="chips" id="chips16"></div>'+
+      '<div class="readout" id="rd16">Escolha uma das três situações.</div>'+
+      '<div class="wrapc" id="acts16"></div>'+
+      '<p class="small">Se um peão atravessar o tabuleiro inteiro e chegar à última fileira, ele é <b>promovido</b>: sai do tabuleiro e vira outra peça, normalmente uma dama. É por isso que um peão avançado assusta tanto.</p>'+
+    '</div>'+
+    '<div class="board-wrap" id="wrap16" style="--bw:420px">'+
+      '<div class="ranks" id="ranks16"></div>'+
+      '<div class="board" id="board16" role="grid" aria-label="Tabuleiro: o peão"></div>'+
+      '<div class="files" id="files16"></div>'+
+    '</div></div>';
+  var bd=new Board($('#board16'));
+  bd.coordsBar($('#ranks16'),$('#files16'));
+  var ro=$('#rd16');
+  var scenes=[
+    {k:'Anda para a frente',pos:{e2:'wP'},from:'e2',
+     txt:'O peão anda uma casa para a frente, sempre na mesma coluna, e nunca para trás.',
+     show:function(){bd.dot('e3');}},
+    {k:'Primeiro movimento: 1 ou 2',pos:{e2:'wP'},from:'e2',
+     txt:'Estando ainda na casa de origem, o peão pode avançar uma ou duas casas. Depois disso, só uma por vez.',
+     show:function(){bd.dot('e3');bd.dot('e4');}},
+    {k:'Captura na diagonal',pos:{e4:'wP',d5:'bP',f5:'bN',e5:'bR'},from:'e4',
+     txt:'Para capturar, o peão vai na diagonal, uma casa. E repare no detalhe que confunde todo mundo: a torre preta em e5 está bem na frente dele e não pode ser capturada. Um peão bloqueado de frente fica parado.',
+     show:function(){bd.dot('d5',true);bd.dot('f5',true);bd.mark('e5','bad');}}
+  ];
+  var cur=0;
+  function play(i){
+    cur=i;var s=scenes[i];
+    bd.position(s.pos);bd.clearMarks();
+    bd.mark(s.from,'hl-soft');
+    s.show();
+    setReadout(ro,s.txt);
+  }
+  var cw=$('#chips16');
+  scenes.forEach(function(s,i){
+    var b=el('button','chip'+(i===0?' on':''),s.k);b.type='button';
+    b.addEventListener('click',function(){
+      $$('.chip',cw).forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');SFX.click();play(i);
+    });
+    cw.appendChild(b);
+  });
+  var bAnim=el('button','btn sm','Executar a jogada');
+  bAnim.type='button';
+  bAnim.addEventListener('click',function(){
+    SFX.click();
+    var s=scenes[cur];
+    var to=cur===0?'e3':cur===1?'e4':'d5';
+    if(!bd.pieces[s.from]){play(cur);return;}
+    bd.clearMarks();
+    var cap=!!bd.pieces[to];
+    bd.move(s.from,to,function(){bd.mark(to,'hl-soft');});
+    if(cap){SFX.cap();setReadout(ro,'O peão capturou na diagonal e agora ocupa a casa '+to+'.','ok');}
+    else{SFX.move();setReadout(ro,'O peão avançou de '+s.from+' para '+to+'.','ok');}
+    setTimeout(function(){bAnim.disabled=false;},600);
+    bAnim.disabled=true;
+  });
+  var bR=el('button','btn ghost sm','Reiniciar');
+  bR.type='button';
+  bR.addEventListener('click',function(){SFX.click();play(cur);bAnim.disabled=false;});
+  $('#acts16').appendChild(bAnim);$('#acts16').appendChild(bR);
+  enterHooks[16]=function(){play(cur);bAnim.disabled=false;};
+})();
+
+/* ============================================================
+   16. TELA 17 · CAPTURA
+   ============================================================ */
+(function(){
+  var bd=new Board($('#board17'));
+  bd.coordsBar($('#ranks17'),$('#files17'));
+  var base={d4:'wR',d7:'bP',g4:'bB'};
+  var ro=$('#capReadout');
+  var busy=false;
+  function reset(){bd.position(base);bd.clearMarks();bd.mark('d4','hl-soft');}
+  function run(to,isCap){
+    if(busy)return;busy=true;
+    reset();
+    setTimeout(function(){
+      bd.clearMarks();
+      bd.move('d4',to,function(){
+        bd.mark(to,isCap?'good':'hl-soft');
+        busy=false;
+      });
+      if(isCap){SFX.cap();setReadout(ro,'Captura: a torre foi até '+to+', tirou o bispo preto do tabuleiro e ocupou a casa dele.','ok');}
+      else{SFX.move();setReadout(ro,'Movimento simples: a torre foi de d4 até '+to+', uma casa que estava vazia.');}
+    },reduced()?0:250);
+  }
+  $('#btnCapMove').addEventListener('click',function(){SFX.click();run('d6',false);});
+  $('#btnCapTake').addEventListener('click',function(){SFX.click();run('g4',true);});
+  enterHooks[17]=function(){busy=false;reset();setReadout(ro,'Aperte um dos botões para ver a cena.');};
+})();
+
+/* ============================================================
+   17. TELA 18 · XEQUE
+   ============================================================ */
+(function(){
+  var bd=new Board($('#board18'));
+  bd.coordsBar($('#ranks18'),$('#files18'));
+  var base={e8:'bK',e5:'wR',a5:'bR',g5:'bB',h1:'wK'};
+  var ro=$('#checkReadout');
+  var busy=false;
+  function reset(){
+    busy=false;
+    bd.position(base);bd.clearMarks();
+    bd.mark('e8','bad');
+    ['e7','e6'].forEach(function(s){bd.mark(s,'hl-soft');});
+    bd.mark('e5','hl');
+    setReadout(ro,'XEQUE! A torre branca em e5 ataca o rei preto pela coluna e.');
+  }
+  var STEPS=[
+    {t:'Mover o rei',d:'O rei sai da linha de ataque e vai para f8.',run:function(){
+      bd.clearMarks();bd.move('e8','f8',function(){bd.mark('f8','good');});SFX.move();
+      setReadout(ro,'Saída 1: o rei foge para f8, fora da coluna e. O xeque acabou.','ok');
+    }},
+    {t:'Capturar quem ataca',d:'A torre preta de a5 vai até e5 e come a torre branca.',run:function(){
+      bd.clearMarks();bd.move('a5','e5',function(){bd.mark('e5','good');});SFX.cap();
+      setReadout(ro,'Saída 2: a torre preta captura a torre branca em e5. Sem atacante, não há xeque.','ok');
+    }},
+    {t:'Bloquear o ataque',d:'O bispo preto de g5 entra em e7 e fecha a coluna.',run:function(){
+      bd.clearMarks();bd.move('g5','e7',function(){bd.mark('e7','good');});SFX.move();
+      setReadout(ro,'Saída 3: o bispo entra na frente, em e7. O ataque da torre para nele e o rei fica protegido.','ok');
+    }}
+  ];
+  var wrap=$('#checkSteps');
+  STEPS.forEach(function(s,i){
+    var b=el('button','step in','<div class="n">'+(i+1)+'</div><div><b>'+s.t+'</b><div class="small">'+s.d+'</div></div>');
+    b.type='button';b.style.cursor='pointer';b.style.textAlign='left';
+    b.addEventListener('click',function(){
+      if(busy)return;busy=true;SFX.click();
+      reset();
+      setTimeout(function(){s.run();busy=false;},reduced()?0:320);
+    });
+    wrap.appendChild(b);
+  });
+  $('#btnCheckReset').addEventListener('click',function(){SFX.click();reset();});
+  enterHooks[18]=function(){reset();};
+})();
+
+/* ============================================================
+   18. TELA 19 · XEQUE-MATE
+   ============================================================ */
+(function(){
+  var bd=new Board($('#board19'));
+  bd.coordsBar($('#ranks19'),$('#files19'));
+  var base={g8:'bK',f7:'bP',g7:'bP',h7:'bP',e1:'wR',a1:'wK'};
+  var ro=$('#mateReadout');
+  var busy=false;
+  function reset(){
+    busy=false;bd.position(base);bd.clearMarks();bd.mark('e1','hl-soft');
+    setReadout(ro,'As brancas jogam. Repare que o rei preto só tem casas ocupadas pelos próprios peões à frente.');
+  }
+  $('#btnMate').addEventListener('click',function(){
+    if(busy)return;busy=true;SFX.click();reset();
+    setTimeout(function(){
+      bd.clearMarks();
+      bd.move('e1','e8',function(){
+        bd.mark('e8','hl');
+        ['f8','h8'].forEach(function(s){bd.mark(s,'bad');});
+        ['f7','g7','h7'].forEach(function(s){bd.mark(s,'bad');});
+        bd.mark('g8','bad');
+        setReadout(ro,'XEQUE-MATE! A torre ataca a fileira 8 inteira. O rei não pode ir para f8 nem h8, porque a torre também ataca essas casas, e não pode subir porque os próprios peões ocupam f7, g7 e h7.','ok');
+        SFX.win();confetti();
+        busy=false;
+      });
+      SFX.move();
+    },reduced()?0:400);
+  });
+  enterHooks[19]=function(){reset();};
+})();
+
+/* ============================================================
+   19. TELA 20 · EMPATE
+   ============================================================ */
+(function(){
+  var bd=new Board($('#board20'));
+  bd.coordsBar($('#ranks20'),$('#files20'));
+  var base={a8:'bK',c7:'wQ',c1:'wK'};
+  var ro=$('#drawReadout');
+  var KINDS=[
+    {t:'Afogamento',d:'O jogador da vez não está em xeque, mas não tem nenhuma jogada legal. É o caso do tabuleiro ao lado.'},
+    {t:'Material insuficiente',d:'Sobraram poucas peças e nenhum dos lados tem como dar mate, por exemplo apenas os dois reis.'},
+    {t:'Acordo entre os jogadores',d:'Os dois percebem que ninguém vai vencer e combinam o empate.'},
+    {t:'Repetição da mesma posição',d:'A mesma posição se repete três vezes na partida, com o mesmo jogador na vez de jogar.'}
+  ];
+  var w=$('#drawSteps');
+  KINDS.forEach(function(k,i){
+    w.appendChild(el('div','step in','<div class="n">'+(i+1)+'</div><div><b>'+k.t+'</b><div class="small">'+k.d+'</div></div>'));
+  });
+  function reset(){
+    bd.position(base);bd.clearMarks();bd.mark('a8','hl-soft');
+    setReadout(ro,'É a vez das pretas. O rei preto não está em xeque, mas não tem para onde ir.');
+  }
+  $('#btnDraw').addEventListener('click',function(){
+    SFX.click();bd.clearMarks();bd.mark('a8','hl-soft');
+    var atk=attacked(base,'w');
+    ['a7','b7','b8'].forEach(function(s){if(atk[s])bd.mark(s,'bad');});
+    setReadout(ro,'As três casas vizinhas (a7, b7 e b8) estão atacadas pela dama branca. Como o rei preto não está em xeque e não tem jogada legal, a partida termina empatada por afogamento.','ok');
+    SFX.no();
+  });
+  enterHooks[20]=function(){reset();};
+})();
+
+/* ============================================================
+   20. TELA 21 · VALORES
+   ============================================================ */
+var VALS=[
+  {c:'P',n:'Peão',v:1},{c:'N',n:'Cavalo',v:3},{c:'B',n:'Bispo',v:3},
+  {c:'R',n:'Torre',v:5},{c:'Q',n:'Dama',v:9},{c:'K',n:'Rei',v:0,lbl:'essencial'}
+];
+(function(){
+  var wrap=$('#valList');
+  VALS.forEach(function(v){
+    var row=el('div','valrow');
+    row.innerHTML='<svg viewBox="0 0 45 45" class="pc w" aria-hidden="true"><use href="#pc-'+v.c.toLowerCase()+'"/></svg>'+
+      '<span class="nm">'+v.n+'</span><span class="bar"><i></i></span><span class="v">0</span>';
+    row.dataset.v=v.v;row.dataset.lbl=v.lbl||'';
+    wrap.appendChild(row);
+  });
+})();
+enterHooks[21]=function(tk){
+  $$('#valList .valrow').forEach(function(row,i){
+    var v=parseInt(row.dataset.v,10),lbl=row.dataset.lbl;
+    var bar=$('.bar i',row),num=$('.v',row);
+    bar.style.width='0';num.textContent=lbl?'—':'0';
+    setTimeout(function(){
+      if(tk!==animToken)return;
+      bar.style.width=(lbl?100:(v/9)*100)+'%';
+      if(lbl){num.textContent='★';num.title='essencial';return;}
+      var n=0;
+      var t=setInterval(function(){
+        if(tk!==animToken){clearInterval(t);return;}
+        n++;num.textContent=n;
+        if(n>=v)clearInterval(t);
+      },reduced()?1:110);
+    },300+i*180);
+  });
+};
+
+/* ============================================================
+   21. TELA 22 · CENTRO
+   ============================================================ */
+(function(){
+  var bd=new Board($('#board22'));
+  bd.coordsBar($('#ranks22'),$('#files22'));
+  var ro=$('#centerReadout');
+  var CEN=['d4','e4','d5','e5'];
+  function base(){
+    bd.clear();bd.clearMarks();
+    CEN.forEach(function(s){bd.mark(s,'center-hl');});
+  }
+  var opts=[
+    {k:'As quatro casas centrais',f:function(){
+      base();
+      setReadout(ro,'d4, e4, d5 e e5. Quem controla essas casas manda no ritmo da partida.');
+    }},
+    {k:'Cavalo no centro',f:function(){
+      bd.clear();bd.clearMarks();
+      bd.put('e4','wN',true);
+      var m=legalMoves({e4:'wN'},'e4');
+      m.all.forEach(function(s){bd.dot(s);});
+      setReadout(ro,'No centro, o cavalo alcança '+m.all.length+' casas.','ok');
+      SFX.move();
+    }},
+    {k:'Cavalo no canto',f:function(){
+      bd.clear();bd.clearMarks();
+      bd.put('a1','wN',true);
+      var m=legalMoves({a1:'wN'},'a1');
+      m.all.forEach(function(s){bd.dot(s);});
+      setReadout(ro,'No canto, o mesmo cavalo alcança só '+m.all.length+' casas. Um cavalo na borda trabalha pela metade.','no');
+      SFX.no();
+    }}
+  ];
+  var cw=$('#centerChips');
+  opts.forEach(function(o,i){
+    var b=el('button','chip'+(i===0?' on':''),o.k);b.type='button';
+    b.addEventListener('click',function(){
+      $$('.chip',cw).forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');SFX.click();o.f();
+    });
+    cw.appendChild(b);
+  });
+  enterHooks[22]=function(){
+    $$('.chip',cw).forEach(function(x,i){x.classList.toggle('on',i===0);});
+    opts[0].f();
+  };
+})();
+
+/* ============================================================
+   22. TELA 23 · PENSE ANTES DE JOGAR
+   ============================================================ */
+(function(){
+  var bd=new Board($('#board23'));
+  bd.coordsBar($('#ranks23'),$('#files23'));
+  var ro=$('#thinkReadout');
+  var base={d5:'wB',e8:'bK',h1:'wK',c6:'bP',b7:'bP'};
+  var busy=false;
+  var Q=[
+    {t:'O que meu adversário está ameaçando?',d:'Antes de pensar no seu plano, olhe a última jogada do adversário e pergunte o que ela ataca.'},
+    {t:'O que eu posso fazer?',d:'Liste duas ou três jogadas possíveis em vez de sair na primeira ideia que apareceu.'},
+    {t:'O que acontece depois da minha jogada?',d:'Imagine a resposta do adversário. Essa é a pergunta que separa quem está aprendendo de quem já joga bem.'}
+  ];
+  var w=$('#thinkSteps');
+  Q.forEach(function(q,i){
+    w.appendChild(el('div','step','<div class="n">'+(i+1)+'</div><div><b>'+q.t+'</b><div class="small">'+q.d+'</div></div>'));
+  });
+  function reset(){
+    busy=false;bd.position(base);bd.clearMarks();bd.mark('d5','hl-soft');
+    setReadout(ro,'O bispo branco em d5 pode capturar o peão de c6. Parece de graça. Será?');
+  }
+  $('#btnThink').addEventListener('click',function(){
+    if(busy)return;busy=true;SFX.click();reset();
+    setTimeout(function(){
+      bd.clearMarks();
+      bd.move('d5','c6',function(){bd.mark('c6','good');});
+      SFX.cap();
+      setReadout(ro,'As brancas capturaram o peão de c6. Um ponto a mais, aparentemente.');
+      setTimeout(function(){
+        bd.clearMarks();
+        bd.move('b7','c6',function(){
+          bd.mark('c6','bad');
+          setReadout(ro,'E aí vem a resposta: o peão de b7 recaptura o bispo. As brancas ganharam 1 ponto e perderam 3. A jogada era ruim, e bastava a terceira pergunta para perceber.','no');
+          SFX.no();busy=false;
+        });
+      },reduced()?60:1100);
+    },reduced()?0:400);
+  });
+  $('#btnThinkReset').addEventListener('click',function(){SFX.click();reset();});
+  enterHooks[23]=function(tk){
+    reset();
+    $$('#thinkSteps .step').forEach(function(s,i){
+      s.classList.remove('in');
+      setTimeout(function(){if(tk===animToken)s.classList.add('in');},200+i*260);
+    });
+  };
+})();
+
+/* ============================================================
+   23. TELA 24 · QUIZ
+   ============================================================ */
+var QUIZ=[
+  {q:'Quantas casas tem o tabuleiro de xadrez?',o:['32 casas','48 casas','64 casas','100 casas'],a:2,
+   e:'São 8 colunas por 8 fileiras, ou seja, 64 casas.'},
+  {q:'Na casa "e4", o que a letra "e" indica?',o:['A fileira','A coluna','A cor da casa','O nome da peça'],a:1,
+   e:'A letra indica a coluna e o número indica a fileira. Sempre nessa ordem.'},
+  {q:'Qual peça anda em L e pode saltar por cima das outras?',o:['O bispo','A torre','O cavalo','A dama'],a:2,
+   e:'Só o cavalo salta. Ele anda duas casas em uma direção e mais uma virando para o lado.'},
+  {q:'A torre pode andar na diagonal?',o:['Sim, sempre','Não: só em linha reta','Só na primeira jogada','Só quando captura'],a:1,
+   e:'A torre anda em linha reta, na horizontal e na vertical. A diagonal é do bispo e da dama.'},
+  {q:'Como o peão captura?',o:['Para a frente','Na diagonal, uma casa','Para os lados','Em L'],a:1,
+   e:'O peão anda para a frente, mas captura na diagonal. Uma peça bem na frente dele fica bloqueando o caminho.'},
+  {q:'Quanto vale a dama, na comparação usada pelos jogadores?',o:['3 pontos','5 pontos','9 pontos','1 ponto'],a:2,
+   e:'A dama vale 9: peão 1, cavalo e bispo 3, torre 5. O rei não tem valor porque não pode ser trocado.'},
+  {q:'O rei está atacado e não existe nenhuma jogada que o salve. Isso é:',o:['Xeque','Empate','Xeque-mate','Captura'],a:2,
+   e:'Xeque é o ataque ao rei; xeque-mate é o ataque sem nenhuma saída, e encerra a partida.'},
+  {q:'Quais são as quatro casas centrais do tabuleiro?',o:['a1, a8, h1, h8','d4, e4, d5, e5','c3, c6, f3, f6','e1, e8, d1, d8'],a:1,
+   e:'d4, e4, d5 e e5. Peças no centro alcançam mais casas e chegam mais rápido aos dois lados.'},
+  {q:'Você pode capturar a dama adversária perdendo o seu bispo nessa troca. Vale a pena?',
+   o:['Não, bispo é mais bonito','Sim: 3 pontos por 9 é ótimo negócio','Tanto faz, todas valem igual','Só se for no fim da partida'],a:1,
+   e:'Trocar uma peça de 3 por uma de 9 é vantajoso. Comparar valores antes de trocar é uma das primeiras coisas que um jogador aprende.'}
+];
+var qi=0,qScore=0,qAnswered=false;
+function renderQuiz(){
+  var q=QUIZ[qi];
+  $('#qCount').textContent='Pergunta '+(qi+1)+' de '+QUIZ.length;
+  $('#qScore').textContent='Pontos: '+qScore;
+  $('#qProgBar').style.width=((qi)/QUIZ.length*100)+'%';
+  var card=$('#quizCard');
+  card.innerHTML='<div class="quiz-q">'+q.q+'</div><div class="opts" id="qOpts"></div><div class="readout" id="qFb" style="margin-top:14px">Escolha uma alternativa.</div>';
+  qAnswered=false;
+  var opts=$('#qOpts');
+  q.o.forEach(function(t,i){
+    var b=el('button','opt','<span class="k">'+'ABCD'[i]+'</span><span>'+t+'</span>');
+    b.type='button';
+    b.addEventListener('click',function(){answer(i,b);});
+    opts.appendChild(b);
+  });
+}
+function answer(i,btn){
+  if(qAnswered)return;
+  var q=QUIZ[qi];
+  var right=(i===q.a);
+  var fb=$('#qFb');
+  if(right){
+    qAnswered=true;
+    btn.classList.add('right');qScore++;SFX.ok();
+    $('#qScore').textContent='Pontos: '+qScore;
+    setReadout(fb,'✅ Acertou! '+q.e,'ok');
+    $$('#qOpts .opt').forEach(function(b){b.disabled=true;});
+    var nx=el('button','btn sm',qi<QUIZ.length-1?'Próxima pergunta →':'Ver resultado 🏆');
+    nx.type='button';
+    nx.addEventListener('click',function(){
+      SFX.click();
+      if(qi<QUIZ.length-1){qi++;renderQuiz();}
+      else finishQuiz();
+    });
+    $('#quizCard').appendChild(el('div','wrapc','')).appendChild(nx);
+    $('#qProgBar').style.width=((qi+1)/QUIZ.length*100)+'%';
+    nx.focus();
+  }else{
+    btn.classList.add('wrong');btn.disabled=true;SFX.no();
+    setReadout(fb,'❌ Tente novamente!','no');
   }
 }
-function queenInit(){posQ=posObj([['d4','q','w'],['d6','p','w'],['g7','n','b']]);clearMarks(B12);renderPos(B12,posQ);queenHi();$('#queenMsg').textContent='Setas azuis = parte torre; verdes = parte bispo!';$('#queenMsg').className='msg gold';}
-function queenHi(){unmarkAll(B12,'hl');unmarkAll(B12,'hl-cap');unmarkAll(B12,'sel');const q=Object.keys(posQ).find(c=>posQ[c].t==='q');if(!q)return;B12._map[q].classList.add('sel');sliderMoves(posQ,'w',q).forEach(m=>mark(B12,m.coord,m.cap?'hl-cap':'hl'));drawQueenRays(B12,posQ,q);}
-B12.addEventListener('click',e=>{const sq=e.target.closest('.sq');if(!sq)return;const c=sq.dataset.coord,m=$('#queenMsg');
-  const q=Object.keys(posQ).find(x=>posQ[x].t==='q');
-  const legal=sliderMoves(posQ,'w',q).find(x=>x.coord===c);
-  if(legal){animateMove(B12,q,c);delete posQ[q];if(legal.cap){delete posQ[c];sfx.cap();m.textContent='🎯 Captura!';m.className='msg good';}else{sfx.move();m.textContent='💨 Que alcance!';m.className='msg good';}posQ[c]={t:'q',c:'w'};setTimeout(()=>queenHi(),animOff()?0:500);}
-  else{sq.classList.add('shake');setTimeout(()=>sq.classList.remove('shake'),450);m.textContent='🚫 Bloqueado ou direção errada!';m.className='msg bad';sfx.bad();}});
-$('#queenReset').addEventListener('click',()=>{sfx.nav();queenInit();});
-const B13=buildBoard($('#board13'),{coords:true,clickable:true});
-const ROOK_OPTS=['a5','h1','e4','c1'],ROOK_OK='c1';
-function rookInit(){clearMarks(B13);clearArrows(B13);renderPos(B13,posObj([['a1','r','w'],['a3','p','w'],['g1','p','w']]));arrow(B13,'a1','a2','#6aa5d8');arrow(B13,'a1','b1','#6aa5d8');ROOK_OPTS.forEach(c=>mark(B13,c,'opt'));$('#rookMsg').textContent='Pense: o que bloqueia? 🤔';$('#rookMsg').className='msg';$('#rookReset').hidden=true;}
-B13.addEventListener('click',e=>{const sq=e.target.closest('.sq');if(!sq||!sq.classList.contains('opt'))return;const c=sq.dataset.coord,m=$('#rookMsg');
-  if(c===ROOK_OK){unmarkAll(B13,'opt');mark(B13,c,'okmark');clearArrows(B13);arrow(B13,'a1',c,'#7ac074',2.6);m.textContent='🎉 Isso! c1 está livre!';m.className='msg good';sfx.ok();$('#rookReset').hidden=false;}
-  else{sq.classList.add('shake');setTimeout(()=>sq.classList.remove('shake'),450);const why=c==='a5'?'o peão a3 bloqueia a coluna!':c==='h1'?'o peão g1 bloqueia a fileira!':'torre só anda em linha reta!';m.textContent='❌ '+why;m.className='msg bad';sfx.bad();}});
-$('#rookReset').addEventListener('click',()=>{sfx.nav();rookInit();});
-const B14=buildBoard($('#board14'),{coords:true});
-const BISH_PATH=['f1','a6','c8','h3','f1'];let bishPaint=false;
-async function bishPlay(){const t=newSeq('bish');bishPaint=false;clearMarks(B14);clearArrows(B14);renderPos(B14,posObj([['f1','b','w']]));$('#bishMsg').textContent='Observando o passeio…';$('#bishMsg').className='msg gold';
-  if(animOff()){BISH_PATH.forEach(c=>mark(B14,c,'trail'));$('#bishMsg').textContent='✨ Só casas CLARAS!';return;}
-  await wait(500);
-  for(let i=0;i<BISH_PATH.length-1;i++){if(seqToken.bish!==t)return;const from=BISH_PATH[i],to=BISH_PATH[i+1];arrow(B14,from,to,'#e8b64c',1.6,true);animateMove(B14,from,to);sfx.move();mark(B14,from,'trail');await wait(750);}
-  if(seqToken.bish!==t)return;mark(B14,'f1','trail');$('#bishMsg').textContent='✨ Rastro só em casas CLARAS!';}
-$('#bishReplay').addEventListener('click',bishPlay);
-$('#bishColor').addEventListener('click',()=>{bishPaint=!bishPaint;sfx.move();for(let f=0;f<8;f++)for(let r=0;r<8;r++)if((f+r)%2===0)B14._map[sqName(f,r)].classList.toggle('trail',bishPaint);if(bishPaint)$('#bishMsg').textContent='🎨 Território deste bispo!';});
-const B15=buildBoard($('#board15'),{coords:true,clickable:true});
-const KN_ALL=knightTargets('d4');let knFound;
-function knightInit(){knFound=new Set();clearMarks(B15);clearArrows(B15);renderPos(B15,posObj([['d4','n','w'],['f5','p','w'],['c6','p','b']]));
-  const s=overlay(B15),x=f=>f*12.5+6.25,y=r=>(7-r)*12.5+6.25;
-  const pl=document.createElementNS('http://www.w3.org/2000/svg','polyline');
-  pl.setAttribute('points',x(3)+','+y(3)+' '+x(3)+','+y(5)+' '+x(4)+','+y(5));
-  pl.setAttribute('fill','none');pl.setAttribute('stroke','#f6d489');pl.setAttribute('stroke-width','1.4');pl.setAttribute('stroke-dasharray','2.5 2');s.appendChild(pl);
-  const t1=document.createElementNS('http://www.w3.org/2000/svg','text');t1.setAttribute('x',x(3)-4);t1.setAttribute('y',(y(3)+y(5))/2);t1.setAttribute('fill','#f6d489');t1.setAttribute('font-size','4');t1.textContent='2';s.appendChild(t1);
-  const t2=document.createElementNS('http://www.w3.org/2000/svg','text');t2.setAttribute('x',(x(3)+x(4))/2-1);t2.setAttribute('y',y(5)-2);t2.setAttribute('fill','#f6d489');t2.setAttribute('font-size','4');t2.textContent='1';s.appendChild(t2);
-  $('#knightCount').textContent='Encontradas: 0 / 7';$('#knightMsg').textContent='';}
-B15.addEventListener('click',e=>{const sq=e.target.closest('.sq');if(!sq)return;const c=sq.dataset.coord;
-  const own=posObj([['f5','p','w']])[c];const ok=KN_ALL.includes(c)&&!own;
-  if(ok&&!knFound.has(c)){knFound.add(c);mark(B15,c,c==='c6'?'hl-cap':'hl');sfx.move();$('#knightCount').textContent='Encontradas: '+knFound.size+' / 7';
-    if(knFound.size===7){$('#knightMsg').textContent='🎉 Perfeito!';$('#knightMsg').className='msg good';sfx.ok();confetti(40);}}
-  else if(!ok){sq.classList.add('shake');setTimeout(()=>sq.classList.remove('shake'),450);sfx.bad();$('#knightMsg').textContent=c==='f5'?'🚫 É sua! Não captura as próprias.':'🚫 Formato L: 2+1!';$('#knightMsg').className='msg bad';}});
-$('#knightReset').addEventListener('click',()=>{sfx.nav();knightInit();});
-const PB1=buildBoard($('#pb1')),PB2=buildBoard($('#pb2')),PB3=buildBoard($('#pb3'));
-async function pawn1(){const t=newSeq('p1');renderPos(PB1,posObj([['e2','p','w']]));clearArrows(PB1);await wait(350);if(seqToken.p1!==t)return;arrow(PB1,'e2','e3','#7ac074');animateMove(PB1,'e2','e3');sfx.move();}
-async function pawn2(){const t=newSeq('p2');renderPos(PB2,posObj([['e2','p','w']]));clearArrows(PB2);unmarkAll(PB2,'hl');mark(PB2,'e3','hl');mark(PB2,'e4','hl');await wait(350);if(seqToken.p2!==t)return;arrow(PB2,'e2','e4','#7ac074');animateMove(PB2,'e2','e4');sfx.move();}
-async function pawn3(){const t=newSeq('p3');renderPos(PB3,posObj([['d5','p','w'],['d6','p','b'],['e6','p','b']]));clearArrows(PB3);unmarkAll(PB3,'no');mark(PB3,'d6','no');await wait(450);if(seqToken.p3!==t)return;arrow(PB3,'d5','e6','#e05656');animateMove(PB3,'d5','e6');sfx.cap();}
-$('#pb1r').addEventListener('click',pawn1);$('#pb2r').addEventListener('click',pawn2);$('#pb3r').addEventListener('click',pawn3);
-const B17=buildBoard($('#board17'),{coords:true});
-async function capPlay(){const t=newSeq('cap');clearArrows(B17);clearMarks(B17);renderPos(B17,posObj([['e1','r','w']]));const m=$('#capMsg');
-  m.textContent='1️⃣ MOVIMENTO: torre vai a casa VAZIA (e3).';m.className='msg gold';
-  await wait(600);if(seqToken.cap!==t)return;arrow(B17,'e1','e3','#6aa5d8');animateMove(B17,'e1','e3');sfx.move();
-  await wait(1500);if(seqToken.cap!==t)return;clearArrows(B17);renderPos(B17,posObj([['e1','r','w'],['e5','n','b']]));
-  m.textContent='2️⃣ CAPTURA: toma a casa do cavalo! ⚔️';m.className='msg gold';
-  await wait(700);if(seqToken.cap!==t)return;arrow(B17,'e1','e5','#e05656');animateMove(B17,'e1','e5');sfx.cap();
-  await wait(900);if(seqToken.cap!==t)return;m.textContent='MOVIMENTO ≠ CAPTURA ✔️';m.className='msg good';}
-$('#capReplay').addEventListener('click',capPlay);
-const B18=buildBoard($('#board18'),{coords:true});
-async function checkPlay(){const t=newSeq('chk');clearArrows(B18);clearMarks(B18);renderPos(B18,posObj([['e8','k','b'],['e1','q','w']]));$('#checkMsg').innerHTML='&nbsp;';
-  await wait(600);if(seqToken.chk!==t)return;arrow(B18,'e1','e6','#e8b64c');animateMove(B18,'e1','e6');sfx.move();
-  await wait(650);if(seqToken.chk!==t)return;arrow(B18,'e6','e8','#e05656',2.6,true);B18._map['e8'].classList.add('danger');banner('XEQUE! ⚠️');sfx.bad();
-  $('#checkMsg').textContent='⚠️ O rei preto está em XEQUE!';$('#checkMsg').className='msg bad';}
-$('#checkReplay').addEventListener('click',checkPlay);
-const D1=buildBoard($('#def1')),D2=buildBoard($('#def2')),D3=buildBoard($('#def3'));
-renderPos(D1,posObj([['e8','k','b'],['e6','q','w']]));arrow(D1,'e8','d8','#7ac074');
-renderPos(D2,posObj([['e8','k','b'],['e6','q','w'],['g7','n','b']]));arrow(D2,'g7','e6','#7ac074');
-renderPos(D3,posObj([['e8','k','b'],['e6','q','w'],['f8','b','b']]));arrow(D3,'f8','e7','#7ac074');
-const B19=buildBoard($('#board19'),{coords:true});
-async function matePlay(){const t=newSeq('mate');clearArrows(B19);clearMarks(B19);renderPos(B19,posObj([['e8','k','b'],['e6','k','w'],['e2','q','w']]));$('#mateMsg').innerHTML='&nbsp;';
-  await wait(600);if(seqToken.mate!==t)return;arrow(B19,'e2','e7','#e8b64c');animateMove(B19,'e2','e7');sfx.move();
-  await wait(700);if(seqToken.mate!==t)return;B19._map['e8'].classList.add('danger');arrow(B19,'e7','e8','#e05656',2.6,true);
-  ['d8','f8','d7','f7'].forEach(c=>mark(B19,c,'no'));arrow(B19,'e6','e7','#7ac074',1.6,true);
-  await wait(450);if(seqToken.mate!==t)return;banner('XEQUE-MATE! 🏆');$('#mateMsg').textContent='🏆 XEQUE + NENHUMA FUGA = MATE!';$('#mateMsg').className='msg gold';sfx.ok();confetti(90);}
-$('#mateReplay').addEventListener('click',matePlay);
-const B20=buildBoard($('#board20'),{coords:true});
-renderPos(B20,posObj([['a8','k','b'],['b6','q','w'],['c6','k','w']]));
-['a7','b7','b8'].forEach(c=>mark(B20,c,'no'));mark(B20,'a8','glow');
-function playBars(){$$('.val').forEach(v=>{const bar=v.querySelector('.bar i'),w=getComputedStyle(v).getPropertyValue('--w');bar.style.transition='none';bar.style.width='0';void bar.offsetWidth;bar.style.transition='';bar.style.width=w;});}
-const B22=buildBoard($('#board22'),{coords:true});
-['d4','e4','d5','e5'].forEach(c=>mark(B22,c,'glow'));
-const MC1=buildBoard($('#miniC1')),MC2=buildBoard($('#miniC2'));
-setP(MC1,'e4','n','w');knightTargets('e4').forEach(c=>mark(MC1,c,'hl'));
-setP(MC2,'a1','n','w');knightTargets('a1').forEach(c=>mark(MC2,c,'hl'));
-const B23=buildBoard($('#board23'),{coords:true});
-async function thinkPlay(){const t=newSeq('think');clearArrows(B23);clearMarks(B23);['ts1','ts2','ts3'].forEach(id=>$('#'+id).classList.remove('on'));
-  renderPos(B23,posObj([['d1','q','w'],['d3','p','b'],['g6','b','b']]));
-  await wait(500);if(seqToken.think!==t)return;$('#ts1').classList.add('on');arrow(B23,'g6','d3','#e05656',1.8,true);sfx.nav();
-  await wait(1700);if(seqToken.think!==t)return;$('#ts2').classList.add('on');arrow(B23,'d1','d3','#7ac074',1.8);sfx.nav();
-  await wait(1700);if(seqToken.think!==t)return;animateMove(B23,'d1','d3');sfx.cap();
-  await wait(850);if(seqToken.think!==t)return;$('#ts3').classList.add('on');clearArrows(B23);arrow(B23,'g6','d3','#e05656',2.4);B23._map['d3'].classList.add('danger');sfx.bad();}
-$('#thinkReplay').addEventListener('click',thinkPlay);
-const QUIZ=[
- {q:'Quantas casas tem o tabuleiro?',o:['32','64','100'],c:1,w:'8 × 8 = 64.'},
- {q:'Qual peça anda em “L”?',o:['Bispo','Cavalo','Torre'],c:1,w:'2 + 1, saltando peças!'},
- {q:'O peão captura…',o:['Para frente','Na diagonal','Para trás'],c:1,w:'Anda em frente, captura na diagonal.'},
- {q:'Valor da dama?',o:['5','3','9'],c:2,w:'A mais valiosa!'},
- {q:'Rei atacado = …',o:['Empate','Xeque','Vitória'],c:1,w:'Defender já!'},
- {q:'Xeque-mate é…',o:['Rei em xeque sem escape','Peça capturada','Tempo esgotado'],c:0,w:'Fim de jogo!'},
- {q:'Dama branca começa em…',o:['e1','d1','a1'],c:1,w:'Dama na sua cor.'},
- {q:'Torre em a1 alcança (livre)?',o:['h8','g7','c1'],c:2,w:'Só linha reta.'},
- {q:'Boa abertura?',o:['Centro + desenvolvimento','Caçar peões com a dama','Rei no meio'],c:0,w:'Centro + peças!'},
- {q:'Bispo de casa clara…',o:['Vai às escuras também','Só casas claras','Anda reto'],c:1,w:'Nunca muda de cor.'}];
-let qIdx=0,qScore=0,qFirst=true,qDone=false;
-function quizRender(){const box=$('#quizBox');
-  if(qIdx>=QUIZ.length){qDone=true;const medal=qScore>=80?'🏆':qScore>=50?'🥈':'';
-    const fr=qScore>=80?'Incrível! Enxadrista de respeito!':qScore>=50?'Muito bem! O mate vem!':'Bom começo! Reveja e tente de novo!';
-    box.innerHTML='<div class="q-final"><span class="medal">'+medal+'</span><div class="score">'+qScore+' pontos</div><p style="color:var(--muted);margin:10px 0 16px">'+fr+'</p><button class="btn" id="quizRestart" type="button">🔁 Refazer</button></div>';
-    $('#quizRestart').addEventListener('click',()=>{qIdx=0;qScore=0;qDone=false;sfx.nav();quizRender();});
-    if(qScore>=50)confetti(60);return;}
-  const Q=QUIZ[qIdx];qFirst=true;
-  box.innerHTML='<div class="q-card"><div class="q-top"><span class="chip">Pergunta <b>'+(qIdx+1)+'/'+QUIZ.length+'</b></span><span class="chip">⭐ <b id="qScore">'+qScore+'</b></span></div><p class="q-text">'+Q.q+'</p><div class="q-opts">'+Q.o.map((o,i)=>'<button class="q-opt" type="button" data-i="'+i+'"><span>'+o+'</span></button>').join('')+'</div><div class="q-why" hidden id="qWhy"></div></div>';
-  box.querySelectorAll('.q-opt').forEach(b=>b.addEventListener('click',()=>{
-    if(b.disabled)return;
-    if(+b.dataset.i===Q.c){b.classList.add('good');b.insertAdjacentHTML('beforeend',' ✅');qScore+=qFirst?10:5;
-      box.querySelectorAll('.q-opt').forEach(x=>x.disabled=true);
-      const why=$('#qWhy');why.hidden=false;
-      why.innerHTML='✅ Acertou! <b>+'+(qFirst?10:5)+'.</b> '+Q.w+'<br><button class="btn small" id="qNext" type="button" style="margin-top:10px">'+(qIdx+1<QUIZ.length?'Próxima →':'Resultado 🏁')+'</button>';
-      $('#qNext').addEventListener('click',()=>{sfx.nav();qIdx++;quizRender();});sfx.ok();}
-    else{b.classList.add('badp');b.disabled=true;b.insertAdjacentHTML('beforeend',' ❌');qFirst=false;const why=$('#qWhy');why.hidden=false;why.textContent='❌ Tente novamente!';sfx.bad();}
-    const sc=$('#qScore');if(sc)sc.textContent=qScore;}));}
-ENTER={1:countUps,2:()=>showTL(0),10:kingInit,11:queenInit,12:rookInit,13:bishPlay,14:knightInit,
- 15:()=>{pawn1();setTimeout(pawn2,animOff()?0:1300);setTimeout(pawn3,animOff()?0:2600);},
- 16:capPlay,17:checkPlay,18:matePlay,20:playBars,22:thinkPlay,23:()=>{if(!qDone&&qIdx===0)quizRender();}};
-window.addEventListener('error',ev=>{try{showToast('⚠️ Erro: '+ev.message);}catch(e){}});
-findRound('e4');kingInit();queenInit();rookInit();knightInit();
-renderPos(PB1,posObj([['e2','p','w']]));renderPos(PB2,posObj([['e2','p','w']]));renderPos(PB3,posObj([['d5','p','w'],['d6','p','b'],['e6','p','b']]));
-renderPos(B17,posObj([['e1','r','w'],['e5','n','b']]));renderPos(B18,posObj([['e8','k','b'],['e6','q','w']]));
-renderPos(B19,posObj([['e8','k','b'],['e6','k','w'],['e7','q','w']]));renderPos(B23,posObj([['d1','q','w'],['d3','p','b'],['g6','b','b']]));
-quizRender();goTo(0);
+function finishQuiz(){
+  var pct=Math.round(qScore/QUIZ.length*100);
+  $('#quizCard').innerHTML='<div class="center"><h3>Resultado</h3>'+
+    '<div style="font-family:var(--f-disp);font-size:3rem;font-weight:800;color:var(--gold)">'+qScore+'/'+QUIZ.length+'</div>'+
+    '<p>'+(pct>=80?'Excelente! Você já entendeu o essencial do jogo.':pct>=50?'Bom começo. Vale rever as seções das peças e do xeque-mate.':'Sem problema: volte ao menu e refaça as seções com calma. Ninguém aprende xadrez em uma tacada só.')+'</p></div>';
+  $('#qProgBar').style.width='100%';
+  SFX.win();confetti();
+  updateFinal();
+}
+$('#btnQuizRestart').addEventListener('click',function(){
+  SFX.click();qi=0;qScore=0;renderQuiz();updateFinal();
+});
+enterHooks[24]=function(){if(!$('#qOpts')&&!$('#quizCard').textContent.trim())renderQuiz();};
+renderQuiz();
+
+/* ============================================================
+   24. TELA 25 · FINAL
+   ============================================================ */
+var finalBoard=new Board($('#boardFinal'));
+function updateFinal(){
+  $('#finalScore').innerHTML='<b>Seu desafio final:</b> '+qScore+' de '+QUIZ.length+' pontos.'+
+    (qScore<QUIZ.length?' <span class="small">Dá para melhorar refazendo o quiz na seção 24.</span>':' <span class="small">Placar perfeito.</span>');
+}
+updateFinal();
+enterHooks[25]=function(tk){
+  updateFinal();
+  finalBoard.clear();
+  var pos={e4:'wP',e5:'bP',f3:'wN',c6:'bN',c4:'wB',f6:'bN',e1:'wK',e8:'bK',d1:'wQ',d8:'bQ',a1:'wR',h8:'bR'};
+  var ks=Object.keys(pos);
+  if(reduced()){ks.forEach(function(s){finalBoard.put(s,pos[s]);});return;}
+  ks.forEach(function(s,i){
+    setTimeout(function(){
+      if(tk!==animToken)return;
+      finalBoard.put(s,pos[s],true,0);
+    },i*90);
+  });
+};
+$('#btnRestartAll').addEventListener('click',function(){SFX.click();goTo(1);});
+
+/* ============================================================
+   25. INÍCIO
+   ============================================================ */
+goTo(1,true);
+})();
 </script>
 </body>
 </html>
