@@ -112,6 +112,39 @@ p{margin:0 0 .9em}
   display:none;min-height:100vh;min-height:100dvh;
   padding:calc(var(--top) + 20px) 18px calc(var(--bot) + 24px);
   max-width:1180px;margin:0 auto;
+  position:relative;isolation:isolate;
+}
+
+/* ---- fundo decorativo de xadrez (marca d'água, atrás de todo o conteúdo) ---- */
+.bgart{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.bg-p{
+  position:absolute;height:auto;
+  --fill:#e9d7b4;--stroke:#e9b949;
+  filter:drop-shadow(0 0 40px rgba(233,185,73,.12));
+}
+.bg-p1{width:min(52vh,440px);right:-4%;top:6%;opacity:.055;animation:floatA 14s ease-in-out infinite}
+.bg-p2{width:min(30vh,250px);left:-3%;bottom:4%;opacity:.038;animation:floatB 18s ease-in-out infinite}
+@keyframes floatA{
+  0%,100%{transform:rotate(-9deg) translateY(0)}
+  50%{transform:rotate(-6deg) translateY(-22px)}
+}
+@keyframes floatB{
+  0%,100%{transform:rotate(11deg) translateY(0)}
+  50%{transform:rotate(8deg) translateY(16px)}
+}
+/* telas pares espelham o fundo, para nenhuma sequência ficar repetitiva
+   e para a peça grande não cair sempre atrás do tabuleiro */
+.bgart.alt .bg-p1{right:auto;left:-5%;top:10%}
+.bgart.alt .bg-p2{left:auto;right:-3%;bottom:6%}
+.bgart.alt .bg-grid{right:auto;left:5%}
+.bg-grid{
+  position:absolute;right:6%;bottom:-6%;width:min(38vh,320px);aspect-ratio:1;
+  opacity:.045;transform:rotate(-14deg);border-radius:10px;
+  background-image:
+    linear-gradient(45deg,var(--gold) 25%,transparent 25%,transparent 75%,var(--gold) 75%),
+    linear-gradient(45deg,var(--gold) 25%,transparent 25%,transparent 75%,var(--gold) 75%);
+  background-size:25% 25%;
+  background-position:0 0, 12.5% 12.5%;
 }
 .screen.active{display:block;animation:fadeUp .5s ease both}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -434,6 +467,9 @@ th{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.12em;text-transform
 }
 @media (max-width:560px){
   :root{--top:52px;--bot:74px}
+  .bg-p1{width:min(38vh,240px);opacity:.045}
+  .bg-p2{width:min(22vh,150px);opacity:.03}
+  .bg-grid{width:min(26vh,180px);opacity:.035}
   .cover .art .board-wrap{--bw:min(72%,250px)!important}
   .pbar{display:none}
   body{font-size:15px}
@@ -2371,7 +2407,31 @@ enterHooks[25]=function(tk){
 $('#btnRestartAll').addEventListener('click',function(){SFX.click();goTo(1);});
 
 /* ============================================================
-   25. INÍCIO
+   25. FUNDO DECORATIVO DE CADA TELA
+   ============================================================ */
+(function(){
+  /* peça de destaque escolhida pelo assunto da tela; a segunda varia para nenhuma
+     tela ficar visualmente igual à anterior */
+  var MAIN={1:'k',2:'p',3:'r',4:'q',5:'r',6:'p',7:'b',8:'q',9:'p',10:'q',
+            11:'k',12:'q',13:'r',14:'b',15:'n',16:'p',17:'r',18:'k',19:'k',20:'q',
+            21:'q',22:'n',23:'b',24:'n',25:'k'};
+  var ALT=['n','b','p','r','q','k'];
+  $$('.screen').forEach(function(sec,i){
+    var n=i+1;
+    var a=MAIN[n]||ALT[i%6],b=ALT[(i+2)%6];
+    if(b===a)b=ALT[(i+4)%6];
+    var art=el('div','bgart'+(n%2===0?' alt':''));
+    art.setAttribute('aria-hidden','true');
+    art.innerHTML=
+      '<svg class="bg-p bg-p1" viewBox="0 0 45 45"><use href="#pc-'+a+'"/></svg>'+
+      '<svg class="bg-p bg-p2" viewBox="0 0 45 45"><use href="#pc-'+b+'"/></svg>'+
+      '<div class="bg-grid"></div>';
+    sec.insertBefore(art,sec.firstChild);
+  });
+})();
+
+/* ============================================================
+   26. INÍCIO
    ============================================================ */
 goTo(1,true);
 })();
